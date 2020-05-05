@@ -1,0 +1,39 @@
+#script to import data from the splunk online report 
+# into hades db on sqlite 
+#TODO write a script to automatically upload the data into the database 
+
+
+
+import pandas as pd
+import numpy as np
+
+import_file='c:\sqlite\db\online.csv'
+export_file='c:\sqlite\db\online_transformed.csv'
+
+
+export_cols=['advert_id','region', 'country', 'product', 'price', 'cur', 'seller',
+       'category', 'last_seen', 'type', 'domain', 'url',
+       'date_found', 'business', 'product_brand']
+
+rename_cols={'Product_category_for_polonius':'product_brand','Business':'business',
+                    'report_date':'date_found','cat':'type'
+            }
+
+#read in the csv
+df=pd.read_csv(import_file)
+print(df.head())
+
+
+
+#drop the useless columns 
+df.drop(['score','set_category'], axis=1,inplace=True)
+
+#this is for SQLite rowid , it will just update the row id automatically 
+df['advert_id']='NULL'
+
+df=df.rename(columns=rename_cols)
+
+print(df.columns) 
+print(export_cols)                   
+#write out the csv to be uploaded
+df.to_csv(export_file,index=False, columns=export_cols )
