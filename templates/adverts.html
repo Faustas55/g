@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}
+List adverts 
+{% endblock %}
+{% block content %}
+
+<h1>List of adverts for {{country}}</h1>
+
+{% for advert in adverts%}
+
+    <p><a href={{advert.url}} >{{advert.product}}</a></p>
+
+{% endfor %}
+
+
+{% endblock %}

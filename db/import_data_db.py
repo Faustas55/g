@@ -1,7 +1,7 @@
 #script to import data from the splunk online report 
 # into hades db on sqlite 
 #TODO write a script to automatically upload the data into the database 
-
+#TODO remeber when importing data make sure to use UTF-8 specified and not system
 
 
 import pandas as pd
