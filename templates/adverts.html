@@ -6,11 +6,31 @@ List adverts
 
 <h1>List of adverts for {{country}}</h1>
 
-{% for advert in adverts%}
+<div class="container">
 
-    <p><a href={{advert.url}} >{{advert.product}}</a></p>
+    {% for advert in adverts%}
 
-{% endfor %}
+    <div class="row">
+      <div class="col">
+        <p><a href={{advert.url}} >{{advert.product}}</a></p>
+        <p></p>
+        <p></p>        
+      </div>
+      <div class="col">
+        
+          <select id="category">
+                <option value="Suspected counterfeiter">Suspected counterfeiter</option>
+                <option value="authorised distributer">authorised distributer</option>
+                <option value="False positive">False positive</option>
+                <option value="Takedown">Takedown</option>
+            </select>
+        </div>
+      
+    </div>
+  
 
+
+    {% endfor %}
+</div>
 
 {% endblock %}
