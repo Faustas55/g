@@ -1,4 +1,6 @@
 __pycache__/
 
 *.code-workspace
-*.db
+
+db/hades.db
+

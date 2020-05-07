@@ -5,6 +5,7 @@ from flask import Flask, render_template,request
 from HadesV2App.Models import Advert
 
 from . import app
+from . import db
 
 
 @app.route("/")
@@ -49,6 +50,13 @@ def getadverts(country):
         advert_id = request.form.get('advert_id')
         category = request.form.get('category')
         business = request.form.get('business')
+
+        update_Advert=Advert.query.get(advert_id)
+        update_Advert.category=category
+        update_Advert.business=business
+        db.session.add(update_Advert)
+        db.session.commit()
+
 
 
         print(advert_id,category,business)
