@@ -1,36 +1,60 @@
 {% extends "layout.html" %}
 {% block title %}
-List adverts 
+List adverts
 {% endblock %}
 {% block content %}
 
 <h1>List of adverts for {{country}}</h1>
 
-<div class="container">
+<div class="container-fluid">
 
-    {% for advert in adverts%}
+  {% for advert in adverts%}
 
-    <div class="row">
-      <div class="col">
-        <p><a href={{advert.url}} >{{advert.product}}</a></p>
-        <p></p>
-        <p></p>        
-      </div>
-      <div class="col">
-        
-          <select id="category">
-                <option value="Suspected counterfeiter">Suspected counterfeiter</option>
-                <option value="authorised distributer">authorised distributer</option>
-                <option value="False positive">False positive</option>
-                <option value="Takedown">Takedown</option>
-            </select>
-        </div>
-      
+  <div class="row">
+    <div class="col">
+      <p><small>{{advert.seller}}</small></p>
+
     </div>
-  
+    <div class="col">
+      <p><small><a href={{advert.url}}>{{advert.product}}</a></small></p>
+      <p></p>
+
+    </div>
+    <div class="col">
+
+      <select id="category">
+        <option value="{{advert.category}}">{{advert.category}}</option>
+        <option value="Suspected counterfeiter">Suspected counterfeiter</option>
+        <option value="authorised distributer">authorised distributer</option>
+        <option value="False positive">False positive</option>
+        <option value="Takedown">Takedown</option>
+      </select>
+    </div>
+
+    <div class="col">
+
+      <select id="business">
+        <option value="{{advert.business}}">{{advert.business}}</option>
+        <option value="Crop Protection">Crop Protection</option>
+        <option value="Seeds (BIO)">Seeds (bio)</option>
+      </select>
+    </div>
+
+    <div class="col">
+
+      <select id="product">
+        <option value="{{advert.product_brand}}">{{advert.product_brand}}</option>
+        <option value="Crop Protection">get list of products from db</option>
+        
+      </select>
+    </div>
 
 
-    {% endfor %}
+  </div>
+
+
+
+  {% endfor %}
 </div>
 
 {% endblock %}
