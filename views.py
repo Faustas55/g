@@ -62,18 +62,18 @@ def getadverts(country,category='Default'):
 
     if request.method == 'POST':
         advert_id = request.form.get('advert_id')
-        category = request.form.get('category')
-        business = request.form.get('business')
+        advert_category = request.form.get('category')
+        advert_business = request.form.get('business')
 
         update_Advert=Advert.query.get(advert_id)
-        update_Advert.category=category
-        update_Advert.business=business
+        update_Advert.category=advert_category
+        update_Advert.business=advert_business
         db.session.add(update_Advert)
         db.session.commit()
 
 
 
-        print(advert_id,category,business)
+        #print(advert_id,category,business)
         adverts = Advert.query.filter_by(country=country,category=category).all()
         return render_template(
             "adverts.html",
