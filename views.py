@@ -15,7 +15,9 @@ def category_to_DBCategory(argument):
     switcher = { 
         'Suspected': "Suspected Counterfeiter",
         'Default': "Uncategorised",
-        'Takedown':'Takedown'
+        'Takedown':'Takedown',
+        's':"Suspected Counterfeiter",
+        't' :"Takedown"
     } 
   
     # If no category makes sense then just send the categorised 
