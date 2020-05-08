@@ -2,6 +2,9 @@
 # into hades db on sqlite 
 #TODO write a script to automatically upload the data into the database 
 #TODO remeber when importing data make sure to use UTF-8 specified and not system
+#TODO run an Sqlite backup before import
+
+#TODO add in a region if none 
 
 
 import pandas as pd
@@ -13,7 +16,7 @@ export_file='c:\sqlite\db\online_transformed.csv'
 
 export_cols=['advert_id','region', 'country', 'product', 'price', 'cur', 'seller',
        'category', 'last_seen', 'type', 'domain', 'url',
-       'date_found', 'business', 'product_brand']
+       'date_found', 'business', 'product_brand','polonius_caseid']
 
 rename_cols={'Product_category_for_polonius':'product_brand','Business':'business',
                     'report_date':'date_found','cat':'type'
@@ -31,9 +34,10 @@ df.drop(['score','set_category'], axis=1,inplace=True)
 #this is for SQLite rowid , it will just update the row id automatically 
 df['advert_id']='NULL'
 
+#make polonius_caseid null
+df['polonius_caseid']='NULL'
 df=df.rename(columns=rename_cols)
 
-print(df.columns) 
-print(export_cols)                   
+                
 #write out the csv to be uploaded
 df.to_csv(export_file,index=False, columns=export_cols )
