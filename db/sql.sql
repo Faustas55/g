@@ -16,7 +16,8 @@ CREATE TABLE advert(
   "url" TEXT,
   "date_found" TEXT,
   "business" TEXT,
-  "product_brand" TEXT
+  "product_brand" TEXT,
+  "Polonius_caseid" INTEGER
 );
 
 CREATE INDEX country_idx ON advert (
