@@ -3,5 +3,27 @@
 Home
 {% endblock %}
 {% block content %}
-</H1>Welcome to hades </H1>
+</H1>Welcome to hades V2 </H1>
+
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+<form id="formCountry" ,action="getadverts" method="GET">
+    <select id="country" name="country">
+
+        {%for country in countries%}
+        <option value="{{country}}">{{country}}</option>
+        {%endfor%}
+
+    </select>
+
+    <button id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>  
+
+</form>
+
+
+
+
 {% endblock %}
