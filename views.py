@@ -55,7 +55,8 @@ def getadverts(country,category='Default'):
         return render_template(
             "adverts.html",
             adverts=adverts,
-            country=country
+            country=country,
+            category=category
 
     )
 
@@ -77,7 +78,8 @@ def getadverts(country,category='Default'):
         return render_template(
             "adverts.html",
             adverts=adverts,
-            country=country
+            country=country,
+            category=category
 
     )
 
