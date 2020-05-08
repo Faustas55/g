@@ -7,6 +7,22 @@ from HadesV2App.Models import Advert
 from . import app
 from . import db
 
+def category_to_DBCategory(argument): 
+    #To make it easy to use simple category need a conversion to Sqllite category
+    #So Suspected is suspected category 
+    #Maybe in future could encode the space correctly as URL encoded 
+
+    switcher = { 
+        'Suspected': "Suspected Counterfeiter",
+        'Default': "Uncategorised",
+        'Takedown':'Takedown'
+    } 
+  
+    # If no category makes sense then just send the categorised 
+    return switcher.get(argument, "Uncategorised") 
+
+
+
 
 @app.route("/")
 def home():
@@ -18,26 +34,23 @@ def home():
 
 
 
+
+
+
+    
+
+    
 @app.route("/getadverts")
-#def getadverts():
-    
-    #country='Mexico'
-    #adverts = Advert.query.filter_by(country=country).all()
-    
-    #return render_template(
-     #   "adverts.html",
-      #  adverts=adverts,
-       # country=country
-
-    
-
-    
-
 @app.route("/getadverts/<country>",methods=['GET','POST'])
-def getadverts(country):
+@app.route("/getadverts/<country>/<category>",methods=['GET','POST'])
+def getadverts(country,category='Default'):
    
+    print(category)
+
+    category=category_to_DBCategory(category)
+
     if request.method == 'GET':
-        adverts = Advert.query.filter_by(country=country).all()
+        adverts = Advert.query.filter_by(country=country,category=category).all()
     
         return render_template(
             "adverts.html",
@@ -60,7 +73,7 @@ def getadverts(country):
 
 
         print(advert_id,category,business)
-        adverts = Advert.query.filter_by(country=country).all()
+        adverts = Advert.query.filter_by(country=country,category=category).all()
         return render_template(
             "adverts.html",
             adverts=adverts,
