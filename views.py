@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request,redirect,url_for
 
 from HadesV2App.Models import Advert
 
@@ -26,12 +26,24 @@ def category_to_DBCategory(argument):
 
 
 
-@app.route("/")
+@app.route("/",methods=['GET','POST'])
 def home():
-    
-    return render_template(
-        "home.html"
 
+    #Intercepts the post back to redirect to right country
+    if request.method=='POST':
+
+      return redirect ( url_for('getadverts',country=request.form.get('country')))
+    
+
+
+    #get a list of countries from the database 
+    #countries=[]
+    countries=[country[0] for country in Advert.query.with_entities(Advert.country).distinct().all()]
+        #countries.append(country)
+
+    return render_template(
+        "home.html",
+        countries=countries
     )
 
 
@@ -47,7 +59,7 @@ def home():
 @app.route("/getadverts/<country>/<category>",methods=['GET','POST'])
 def getadverts(country,category='Default'):
    
-    print(category)
+    
 
     category=category_to_DBCategory(category)
 

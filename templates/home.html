@@ -10,10 +10,11 @@ Home
 <p></p>
 <p></p>
 
-<form id="formCountry" ,action="getadverts" method="GET">
+<form id="formCountry" ,action="home" method="POST">
     <select id="country" name="country">
-
+        
         {%for country in countries%}
+        
         <option value="{{country}}">{{country}}</option>
         {%endfor%}
 
