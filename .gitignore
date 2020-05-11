@@ -2,5 +2,5 @@ __pycache__/
 
 *.code-workspace
 
-db\*.db
+db/*.db
 
