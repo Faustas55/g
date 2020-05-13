@@ -17,11 +17,20 @@ CREATE TABLE advert(
   "date_found" TEXT,
   "business" TEXT,
   "product_brand" TEXT,
-  "polonius_caseid" INTEGER
+  "polonius_caseid" INTEGER,
+  "updated_date" TEXT,
+  "uploaded_by" TEXT
 );
 
-CREATE INDEX country_idx ON advert (
-    country
+CREATE INDEX country_category ON advert (
+    country,
+    category
 );
 
+
+CREATE UNIQUE INDEX unique_SelProdDomain ON advert (
+    product,
+    seller,
+    domain
+);
   
