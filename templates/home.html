@@ -3,7 +3,12 @@
 Home
 {% endblock %}
 {% block content %}
-</H1>Welcome to hades V2 </H1>
+<p>
+    <center>
+        <h1 class="text-info">Welcome to hades <small class="text-muted"> V2</small></h1>
+    </center>
+</P>
+
 
 <p></p>
 <p></p>
@@ -12,19 +17,22 @@ Home
 
 <form id="formCountry" ,action="home" method="POST">
     <select id="country" name="country">
-        
+
         {%for country in countries%}
-        
+
         <option value="{{country}}">{{country}}</option>
         {%endfor%}
 
     </select>
 
-    <button id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>  
+    <button id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>
 
 </form>
 
-
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
 
 
 {% endblock %}
