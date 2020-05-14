@@ -17,11 +17,12 @@ engine = create_engine('sqlite:///HadesV2App/db/hades.db', echo=True)
 df_db=pd.read_sql('SELECT * FROM advert', engine)
 
 
-
+#we need to change this to collect the file from where splunk saves it 
 import_file='c:\sqlite\db\online.csv'
-#import_file='c:\sqlite\db\online1.csv'
+
+#We can continue with this intially if we have problems importing with pandas we can use the GUI to import
 export_file='c:\sqlite\db\online_transformed.csv'
-#export_file='c:\sqlite\db\online_transformed1.csv'
+
 
 export_cols=['advert_id','region', 'country', 'product', 'price', 'cur', 'seller',
        'category', 'last_seen', 'cat', 'domain', 'url',
