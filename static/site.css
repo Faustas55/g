@@ -1,3 +1,23 @@
+h6 {
+    
+    color: green;
+}
+
+
+header h1{
+    color: olivedrab;
+    text-align: center;
+
+
+}
+
+
+.seller{
+    color:black;
+    font-size: large;
+    font-weight: 500;
+}
+
 .navbar {
     background-color: lightslategray;
     font-size: 1em;
@@ -24,4 +44,19 @@
 .body-content {
     padding: 5px;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: floralwhite;
+    
+}
+
+a:link {
+    color: #0000ff;
+}
+a:visited {
+  color: black;
+}
+a:hover {
+  color: red;
+}
+a:active {
+  color: #ff0000;
 }
