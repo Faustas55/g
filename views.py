@@ -7,6 +7,14 @@ from HadesV2App.Models import Advert
 from . import app
 from . import db
 
+
+#global variables
+
+#this will be changed when SSO implemented by the app
+user='app'
+
+
+
 def category_to_DBCategory(argument): 
     #To make it easy to use simple category need a conversion to Sqllite category
     #So Suspected is suspected category 
@@ -24,6 +32,13 @@ def category_to_DBCategory(argument):
     return switcher.get(argument, "Uncategorised") 
 
 
+def set_false_positive(advert_id,user):
+    an_advert=Advert.query.get(advert_id)
+    Seller=an_advert.seller
+    Domain=an_advert.domain
+
+    Sellers_adverts=Advert.query.filter_by(seller=Seller,domain=Domain).update({Advert.category: 'false positive',Advert.updated_by:user})
+    db.session.commit()
 
 
 @app.route("/",methods=['GET','POST'])
@@ -79,11 +94,17 @@ def getadverts(country,category='Default'):
         advert_category = request.form.get('category')
         advert_business = request.form.get('business')
 
-        update_Advert=Advert.query.get(advert_id)
-        update_Advert.category=advert_category
-        update_Advert.business=advert_business
-        db.session.add(update_Advert)
-        db.session.commit()
+        #if it is a false positive update for all adverts and get reid of them immediately
+        if advert_category=='false positive':
+            seller=set_false_positive(advert_id,user)
+
+        else:
+
+            update_Advert=Advert.query.get(advert_id)
+            update_Advert.category=advert_category
+            update_Advert.business=advert_business
+            db.session.add(update_Advert)
+            db.session.commit()
 
 
 
