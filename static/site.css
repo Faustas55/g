@@ -107,8 +107,8 @@ a:active {
 .listadverts{
   background-color: #cbf1f5;
     border: 1px dotted #71c9ce;
-    height: 250px;
-    width: 80vw;
+    min-height: 250px;
+    min-width: 700px;
     display: flex;
     
     align-items: center;
