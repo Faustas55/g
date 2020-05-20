@@ -1,8 +1,7 @@
-html
-{
+body{
     height:100vh;
     width:100vw;
-
+    background-color: #e3fdfd;
 }
 
 
@@ -127,8 +126,10 @@ a:active {
     border: 1px solid #71c9ce;
     padding: 10px;
     border-radius: 5px;
-    
-  
   
   }
-  
+
+  footer{
+
+    margin-top:150px;
+  }

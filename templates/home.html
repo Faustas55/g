@@ -5,27 +5,28 @@ Home
 {% block content %}
 
 
-    <h2>Welcome to Hades V2</h2>
+<h2>Welcome to Hades V2</h2>
 
 
 
 
 
 
-<form id="formCountry" ,action="home" method="POST">
-    <p>Please select a country</p>
-    <select id="country" name="country">
+    <form id="formCountry" ,action="home" method="POST">
+        <p>Please select a country</p>
+        <select id="country" name="country">
 
-        {%for country in countries%}
+            {%for country in countries%}
 
-        <option value="{{country}}">{{country}}</option>
-        {%endfor%}
+            <option value="{{country}}">{{country}}</option>
+            {%endfor%}
 
-    </select>
+        </select>
 
-    <button class="btncountry" id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>
+        <button class="btncountry" id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>
 
-</form>
+    </form>
+
 
 
 
