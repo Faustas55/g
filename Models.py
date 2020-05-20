@@ -7,4 +7,4 @@ class Advert(db.Model):
     country= db.Column(db.Text)
     category= db.Column(db.Text)
     updated_by= db.Column(db.Text)
-
+    seller = db.Column(db.Text)

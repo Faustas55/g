@@ -78,16 +78,14 @@ def getadverts(country,category='Default'):
 
     category=category_to_DBCategory(category)
 
-    if request.method == 'GET':
-        adverts = Advert.query.filter_by(country=country,category=category).all()
+    #if request.method == 'GET':
+        #adverts = Advert.query.filter_by(country=country,category=category).order_by(Advert.seller).all()
     
-        return render_template(
-            "adverts.html",
-            adverts=adverts,
-            country=country,
-            category=category
-
-    )
+        #return render_template(
+           # "adverts.html",
+           # adverts=adverts,
+            #country=country,
+            #category=category)
 
     if request.method == 'POST':
         advert_id = request.form.get('advert_id')
@@ -108,13 +106,15 @@ def getadverts(country,category='Default'):
 
 
 
-        #print(advert_id,category,business)
-        adverts = Advert.query.filter_by(country=country,category=category).all()
-        return render_template(
-            "adverts.html",
-            adverts=adverts,
-            country=country,
-            category=category
+    #Get all the adverts by country and category and order by seller 
+    adverts = Advert.query.filter_by(country=country,category=category).order_by(Advert.seller).all()
+    print(len(adverts))
+    return render_template(
+        "adverts.html",
+        adverts=adverts,
+        country=country,
+        category=category,
+        count=len(adverts)
 
     )
 
