@@ -1,22 +1,11 @@
-h6 {
-    
-    color: green;
-}
-
-
-header h1{
-    color: olivedrab;
-    text-align: center;
-
+html
+{
+    height:100vh;
+    width:100vw;
 
 }
 
 
-.seller{
-    color:black;
-    font-size: large;
-    font-weight: 600;
-}
 
 .navbar {
     background-color: lightslategray;
@@ -41,12 +30,7 @@ header h1{
     margin-left: 30px;
 }
 
-.body-content {
-    padding: 5px;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: floralwhite;
-    
-}
+
 
 a:link {
     color: #0000ff;
@@ -60,3 +44,91 @@ a:hover {
 a:active {
   color: #ff0000;
 }
+
+.body-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #e3fdfd;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0px;
+    color: navy;
+    
+  }
+  
+  h2 {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    color: navy;
+  
+  }
+  
+  .navbar {
+    font-size: 0.8em;
+    background-color: #71c9ce;
+    padding: 10px;
+  
+  }
+  
+
+
+
+  
+  form {
+    background-color: #cbf1f5;
+    border: 1px dotted #71c9ce;
+    height: 150px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 15px;
+    
+    
+  }
+   
+  
+  select {
+    color: navy;
+    width: 200px;
+    padding: 5px 5px 5px 5px;
+    font-size: 15px;
+    border: 1px solid #71c9ce;
+    height: 34px;
+  
+    -moz-appearance: none;
+    appearance: none;
+    background: url(http://www.stackoverflow.com/favicon.ico) 96% / 15% no-repeat #a6e3e9;
+  }
+  
+.listadverts{
+  background-color: #cbf1f5;
+    border: 1px dotted #71c9ce;
+    height: 250px;
+    width: 80vw;
+    display: flex;
+    
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 15px;
+
+
+}
+
+
+  
+  button{
+    color: navy;
+    background: #e3fdfd;
+    border: 1px solid #71c9ce;
+    padding: 10px;
+    border-radius: 5px;
+    
+  
+  
+  }
+  
