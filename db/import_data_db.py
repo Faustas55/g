@@ -73,6 +73,8 @@ df.loc[:,'advert_id']=None
 #make polonius_caseid null
 df.loc[:,'polonius_caseid']=None
 
+
+
 #set that the "upload user " has updated 
 df.loc[:,'updated_by']='upload'
 #and when uploaded
@@ -81,9 +83,12 @@ df.loc[:,'updated_date']=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 #rename the columns so it fits the table columns
 df=df.rename(columns=rename_cols)
 
-                
+#set category to lowercase 
+df['category']=df['category'].str.lower()
+
+
 #write out the csv to be uploaded ..this is now just a backup 
-df.to_csv(export_file,index=False, columns=export_cols, )
+df.to_csv(export_file,index=False, columns=export_cols)
 
 #write the adverts back to the table "advert" as one big hit 
 df.to_sql('advert', con=engine, if_exists='append',
