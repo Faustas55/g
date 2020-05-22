@@ -6,6 +6,8 @@
 
 #TODO add in a region if none - Faustas 
 
+#TODO check if seller is a false positive if yes do not import and discard 
+
 
 import pandas as pd
 import numpy as np
@@ -56,14 +58,6 @@ df.drop(['score','set_category'], axis=1,inplace=True)
 
 #merge so we only get new adverts .New adverts=new seller + domain + product
 df_merge=df_db.merge(df,indicator=True,how='outer',on=['seller','product','domain'])
-
-#debugging stuff not needed and will probably delete
-#print(df_db.shape)
-#print(df.shape)
-
-#print(df_merge[df_merge['_merge']=='right_only'].shape)
-#print (df_merge['_merge'].value_counts())
-#print (df_merge.columns)
 
 #take only the right sided ones . these are adverts that are not in the sqlite database ..i.e the new ones
 df=df_merge[df_merge['_merge']=='right_only']

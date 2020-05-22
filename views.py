@@ -33,10 +33,15 @@ def category_to_DBCategory(argument):
 
 
 def set_false_positive(advert_id,user):
+    #set all sellers of the advertid to flase positive for the domain of the advert
+    #user is for logging  who updated the the seller . 
+
     an_advert=Advert.query.get(advert_id)
     Seller=an_advert.seller
     Domain=an_advert.domain
 
+    #NOTICE the .update feature always use it without .all() or .first()
+    #This took me a long time to find this on the internet 
     Sellers_adverts=Advert.query.filter_by(seller=Seller,domain=Domain).update({Advert.category: 'false positive',Advert.updated_by:user})
     db.session.commit()
 
@@ -44,7 +49,7 @@ def set_false_positive(advert_id,user):
 @app.route("/",methods=['GET','POST'])
 def home():
 
-    #Intercepts the post back to redirect to right country
+    #Intercepts the post back to redirect to adverts.html and the selected country
     if request.method=='POST':
 
       return redirect ( url_for('getadverts',country=request.form.get('country')))
@@ -92,7 +97,8 @@ def getadverts(country,category='Default'):
         advert_category = request.form.get('category')
         advert_business = request.form.get('business')
 
-        #if it is a false positive update for all adverts and get reid of them immediately
+        #if it is a false positive update for all adverts and get rid of them immediately
+        #this is for all sellers for a domain only.
         if advert_category=='false positive':
             seller=set_false_positive(advert_id,user)
 
