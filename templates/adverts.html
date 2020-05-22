@@ -14,7 +14,12 @@ List adverts
     
         <input id="advert_id" name="advert_id" type="hidden" value={{advert.advert_id}}>
 
-        {{advert.seller}}
+        <div class=seller_details>
+          <p>Seller: {{advert.seller}}</p>  
+          <p>Price: {{advert.price}}</p>
+        
+        </div>
+        
 
       
       

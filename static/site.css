@@ -133,3 +133,16 @@ a:active {
 
     margin-top:150px;
   }
+
+  .seller_details{
+    min-width:50%;
+    display: flex;
+    justify-content: space-between;
+    margin-right: 20px;
+    padding:0px;
+    align-items: space-between;
+    
+    flex-direction: row;
+  }
+
+
