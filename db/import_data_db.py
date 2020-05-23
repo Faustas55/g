@@ -6,7 +6,9 @@
 
 #TODO add in a region if none - Faustas 
 
-#TODO check if seller is a false positive if yes do not import and discard 
+#TODO check if seller and domain is a false positive if yes do not import and discard 
+
+#TODO check if seller and domain is in the database if so then update previous category
 
 
 import pandas as pd
