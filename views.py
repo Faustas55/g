@@ -12,29 +12,31 @@ from . import db
 
 #this will be changed when SSO implemented by the app
 user='app'
+upload_user='upload'
 
 
 
-def category_to_DBCategory(argument): 
-    #To make it easy to use simple category need a conversion to Sqllite category
-    #So Suspected is suspected category 
-    #Maybe in future could encode the space correctly as URL encoded 
+def get_catlist_user(category): 
+    #This module selects the categories that are relevant for the state of the application
+    #Usually this is the default but can pass in other states such as only suspected 
+    #What is being sent to polonius ('polo)
+    #returns a list of categories and the relevant user .new =  'upload' , updated = 'app'
 
     switcher = { 
         'Suspected': "suspected counterfeiter",
-        'Default': "uncategorised",
         'Takedown':'takedown',
         's':"suspected counterfeiter",
-        't' :"takedown"
+        't' :"takedown",
+        'polo':[['suspected counterfeiter','takedown'],user]
     } 
   
-    # If no category makes sense then just send the categorised 
-    return switcher.get(argument, "uncategorised") 
+    # If default or no category then just send the new adverts 
+    return switcher.get(category, [['uncategorised','suspected counterfeiter','takedown'],upload_user]) 
 
 
 def set_false_positive(advert_id,user):
-    #set all sellers of the advertid to flase positive for the domain of the advert
-    #user is for logging  who updated the the seller . 
+    #set all sellers of the advertid to false positive for the domain of the advert
+    #user is for logging  who updated the advert . 
 
     updated_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -82,9 +84,11 @@ def home():
 def getadverts(country,category='Default'):
    
     
+        
 
-    category=category_to_DBCategory(category)
-
+    categories,by_user=get_catlist_user(category)
+    #categories=categories_user[0]
+    #user=categories_user[1]
    
     if request.method == 'POST':
         advert_id = request.form.get('advert_id')
@@ -98,6 +102,7 @@ def getadverts(country,category='Default'):
 
         else:
 
+            
             update_Advert=Advert.query.get(advert_id)
             update_Advert.category=advert_category
             update_Advert.business=advert_business
@@ -109,7 +114,7 @@ def getadverts(country,category='Default'):
 
 
     #Get all the adverts by country and category and order by seller 
-    adverts = Advert.query.filter_by(country=country,category=category).order_by(Advert.seller).all()
+    adverts = Advert.query.filter(Advert.country==country,Advert.category.in_(categories),Advert.updated_by==by_user).order_by(Advert.seller).all()
     print(len(adverts))
     return render_template(
         "adverts.html",
