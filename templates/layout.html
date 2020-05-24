@@ -7,6 +7,33 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='normalize.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css')}}" />
 
+    <script>
+        function ValidateForm(advert_id){
+
+            var x= document.forms['adverts_form'+advert_id.toString()]['business'].value;
+            var y=document.forms['adverts_form'+advert_id.toString()]['category'].value;
+            if (y=='not relevant'){
+                return true;
+            }
+            else if(y=='uncategorised'){
+                alert('Please classify the advert');
+                return false;
+            }
+            else if (x=='None'){
+                alert('Please classify advert as seeds or crop Protection');
+                return false;
+
+            }
+
+
+
+        }
+
+
+    </script>
+
+
+
 </head>
 
 <body>
