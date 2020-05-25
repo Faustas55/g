@@ -65,7 +65,7 @@ print(df.head())
 
 #merging df with country and region database, renaming the column back into "region" - F
 df=pd.merge(df, df_region, on='country', how='left')
-df=df.rename(columns={'region_y':'region')
+df=df.rename(columns={'region_y':'region'})
                       
 #drop some more useless columns before we merge 
 df.drop(['score','set_category'], axis=1,inplace=True)
