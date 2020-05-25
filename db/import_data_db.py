@@ -25,7 +25,7 @@ df_db=pd.read_sql('SELECT * FROM advert', engine)
 
 
 #we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 10:00am Basel time)
-import_file='C:\Program Files\Splunk\var\run\splunk\csv\newtest.csv'
+import_file='C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv'
 
 #importing a file with countries and regions that will be joined with the main database - F
 df_region=('c:\sqlite\db\regioncountry.csv', keep_default_na=False, na_values=['_'])
