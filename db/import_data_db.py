@@ -76,34 +76,38 @@ df_merge=df_db.merge(df,indicator=True,how='outer',on=['seller','product','domai
 #take only the right sided ones . these are adverts that are not in the sqlite database ..i.e the new ones
 df=df_merge[df_merge['_merge']=='right_only']
 
-#drop all the useless columns created by the merge .. i.e the adverts already in database
-df.drop(columns_drop,axis=1,inplace=True)
+if df.empty:
+       print('No new adverts found ')
+
+else:
+       #drop all the useless columns created by the merge .. i.e the adverts already in database
+       df.drop(columns_drop,axis=1,inplace=True)
 
 
-#this is for SQLite rowid which is a primary key, send in a null object and sqlite will sort this out
-df.loc[:,'advert_id']=None
+       #this is for SQLite rowid which is a primary key, send in a null object and sqlite will sort this out
+       df.loc[:,'advert_id']=None
 
 
-#make polonius_caseid null
-df.loc[:,'polonius_caseid']=None
+       #make polonius_caseid null
+       df.loc[:,'polonius_caseid']=None
 
 
 
-#set that the "upload user " has updated 
-df.loc[:,'updated_by']='upload'
-#and when uploaded
-df.loc[:,'updated_date']=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+       #set that the "upload user " has updated 
+       df.loc[:,'updated_by']='upload'
+       #and when uploaded
+       df.loc[:,'updated_date']=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-#rename the columns so it fits the table columns
-df=df.rename(columns=rename_cols)
+       #rename the columns so it fits the table columns
+       df=df.rename(columns=rename_cols)
 
-#set category to lowercase 
-df['category']=df['category'].str.lower()
+       #set category to lowercase 
+       df['category']=df['category'].str.lower()
 
 
-#write out the csv to be uploaded ..this is now just a backup 
-df.to_csv(export_file,index=False, columns=export_cols)
+       #write out the csv to be uploaded ..this is now just a backup 
+       df.to_csv(export_file,index=False, columns=export_cols)
 
-#write the adverts back to the table "advert" as one big hit 
-df.to_sql('advert', con=engine, if_exists='append',
-          index=False,dtype={"business": Text(),"product_brand":Text()})
+       #write the adverts back to the table "advert" as one big hit 
+       df.to_sql('advert', con=engine, if_exists='append',
+              index=False,dtype={"business": Text(),"product_brand":Text()})
