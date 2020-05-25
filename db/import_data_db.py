@@ -19,19 +19,14 @@ from sqlalchemy.types import Integer,Text
 from sqlalchemy import create_engine
 engine = create_engine('sqlite:///HadesV2App/db/hades.db', echo=True)
 
-
 #getting the advert table and convert into a dataframe ... 
 df_db=pd.read_sql('SELECT * FROM advert', engine)
-
-
 
 #we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 11:00am Basel time)
 import_file='C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv'
 
 #debugging and test purposes 
 import_file='C:\\temp\\online.csv'
-
-
 
 #importing a file with countries and regions that will be joined with the main database - F
 df_region=pd.read_csv('c:\\sqlite\\db\\regioncountry.csv', keep_default_na=False, na_values=['_'])
@@ -76,6 +71,7 @@ df_merge=df_db.merge(df,indicator=True,how='outer',on=['seller','product','domai
 #take only the right sided ones . these are adverts that are not in the sqlite database ..i.e the new ones
 df=df_merge[df_merge['_merge']=='right_only']
 
+#check to see if we have any new adverts before proceeding 
 if df.empty:
        print('No new adverts found ')
 
@@ -83,15 +79,11 @@ else:
        #drop all the useless columns created by the merge .. i.e the adverts already in database
        df.drop(columns_drop,axis=1,inplace=True)
 
-
-       #this is for SQLite rowid which is a primary key, send in a null object and sqlite will sort this out
+        #this is for SQLite rowid which is a primary key, send in a null object and sqlite will sort this out
        df.loc[:,'advert_id']=None
-
 
        #make polonius_caseid null
        df.loc[:,'polonius_caseid']=None
-
-
 
        #set that the "upload user " has updated 
        df.loc[:,'updated_by']='upload'
@@ -103,7 +95,6 @@ else:
 
        #set category to lowercase 
        df['category']=df['category'].str.lower()
-
 
        #write out the csv to be uploaded ..this is now just a backup 
        df.to_csv(export_file,index=False, columns=export_cols)
