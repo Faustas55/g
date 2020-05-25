@@ -34,7 +34,7 @@ import_file='C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv
 
 
 #importing a file with countries and regions that will be joined with the main database - F
-df_region=('c:\sqlite\db\regioncountry.csv', keep_default_na=False, na_values=['_'])
+df_region=pd.read_csv('c:\sqlite\db\regioncountry.csv', keep_default_na=False, na_values=['_'])
 
 #We can continue with this intially if we have problems importing with pandas we can use the GUI to import
 export_file='c:\sqlite\db\online_transformed.csv'
