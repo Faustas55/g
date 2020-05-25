@@ -4,7 +4,7 @@
 
 #TODO Sqlite admin : run an Sqlite backup before import ..schedule on server or create a script ? 
 
-#TODO add in a region if none - Faustas 
+#TODO add in a region if none - Faustas = Done
 
 #TODO check if seller and domain is a false positive if yes do not import and discard 
 
@@ -26,6 +26,9 @@ df_db=pd.read_sql('SELECT * FROM advert', engine)
 
 #we need to change this to collect the file from where splunk saves it 
 import_file='c:\sqlite\db\online.csv'
+
+#importing a file with countries and regions that will be joined with the main database - F
+df_region='c:\sqlite\db\regioncountry.csv'
 
 #We can continue with this intially if we have problems importing with pandas we can use the GUI to import
 export_file='c:\sqlite\db\online_transformed.csv'
@@ -54,7 +57,10 @@ columns_drop=['advert_id', 'region_x', 'country_x', 'price_x', 'cur_x',
 df=pd.read_csv(import_file)
 print(df.head())
 
-
+#merging df with country and region database, renaming the column back into "region" - F
+df=pd.merge(df, df_region, on='country', how='left')
+df=df.rename(columns={'region_y':'region')
+                      
 #drop some more useless columns before we merge 
 df.drop(['score','set_category'], axis=1,inplace=True)
 
