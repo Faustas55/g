@@ -6,7 +6,7 @@
 
 #TODO add in a region if none - Faustas = Done
 
-#TODO check if seller and domain is a false positive if yes do not import and discard 
+#TODO check if seller and domain is a false positive if yes do not import and discard = Rich -DONE
 
 #TODO check if seller and domain is in the database if so then update previous category
 
@@ -19,8 +19,7 @@ from sqlalchemy.types import Integer,Text
 from sqlalchemy import create_engine
 engine = create_engine('sqlite:///HadesV2App/db/hades.db', echo=True)
 
-#getting the advert table and convert into a dataframe ... 
-df_db=pd.read_sql('SELECT * FROM advert', engine)
+
 
 #we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 11:00am Basel time)
 import_file='C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv'
@@ -37,7 +36,7 @@ export_file='c:\sqlite\db\online_transformed.csv'
 #These are the columns only needed for the export to csv file 
 export_cols=['advert_id','region', 'country', 'product', 'price', 'cur', 'seller',
        'category', 'last_seen', 'cat', 'domain', 'url',
-       'date_found', 'business', 'product_brand','polonius_caseid','updated_date','updated_by']
+       'date_found', 'polonius_caseid','updated_date','updated_by']
 
 
 #we need to rename the columns as they are different in the splunk report , plus whilst
@@ -54,28 +53,53 @@ columns_drop=['advert_id', 'region_x', 'country_x', 'price_x', 'cur_x',
                      'updated_date', 'updated_by','_merge']
 
 
+#getting the advert table and convert into a dataframe ... 
+df_db=pd.read_sql('SELECT * FROM advert', engine)
+
+
 #read in the csv from splunk
 df=pd.read_csv(import_file)
-print(df.head())
+#print(df.head())
+
+#get non-relevant sellers
+df_notrelevant = df_db[df_db['category']=='not relevant'][['seller','domain']]
+
+
 
 #merging df with country and region database, renaming the column back into "region" - F
 df=pd.merge(df, df_region, on='country', how='left')
 df=df.rename(columns={'region_y':'region'})
-                      
-#drop some more useless columns before we merge 
-df.drop(['score','set_category'], axis=1,inplace=True)
+print(df.shape)             
+
+
+#get rid of non -relevant sellers adverts 
+df_merge_nr=df_notrelevant.merge(df,how='outer',indicator=True,on=['seller','domain'])
+df=df_merge_nr[df_merge_nr['_merge']=='right_only']
+print(df.shape) 
+
+#drop some more useless columns before we merge again  
+df.drop(['score','set_category','_merge'], axis=1,inplace=True)
 
 #merge so we only get new adverts .New adverts=new seller + domain + product
 df_merge=df_db.merge(df,indicator=True,how='outer',on=['seller','product','domain'])
+print(df.columns)
+
+
+#merge with df_not relevant to get rid of non relevant sellers
+#df_nr = df_merge.merge(df_notrelevant,indicator=True,how='outer',on=['seller','product','domain'])
 
 #take only the right sided ones . these are adverts that are not in the sqlite database ..i.e the new ones
 df=df_merge[df_merge['_merge']=='right_only']
+print(df.shape) 
+
 
 #check to see if we have any new adverts before proceeding 
 if df.empty:
        print('No new adverts found ')
 
 else:
+       
+       
        #drop all the useless columns created by the merge .. i.e the adverts already in database
        df.drop(columns_drop,axis=1,inplace=True)
 
@@ -97,6 +121,7 @@ else:
        df['category']=df['category'].str.lower()
 
        #write out the csv to be uploaded ..this is now just a backup 
+       print(df.columns)
        df.to_csv(export_file,index=False, columns=export_cols)
 
        #write the adverts back to the table "advert" as one big hit 
