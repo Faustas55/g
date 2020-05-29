@@ -10,6 +10,8 @@
 
 #TODO check if seller and domain is in the database if so then update previous category
 
+#TODO check if selelr and domain are etc etc 
+
 
 import pandas as pd
 import numpy as np
