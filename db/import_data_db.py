@@ -160,7 +160,7 @@ else:
     df["category"] = df["category"].str.lower()
 
     # write out the csv to be uploaded ..this is now just a backup
-    print(df.columns)
+   
     df.to_csv(export_file, index=False, columns=export_cols)
     # write the adverts back to the table "advert" as one big hit
     df.to_sql(
