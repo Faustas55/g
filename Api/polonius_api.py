@@ -1,5 +1,41 @@
+#this is the script to take the suspected and takedown cases and import into polonius 
+
+# TODO get the relevant cases from the hades database into casepayload
+# TODO captilize everything before sending
+# TODO update database with relevant Polonius case number 
+
+
+
+
 # Import libraries
 import requests
+from sqlalchemy import create_engine
+import pandas as pd
+
+#create the connection to the database 
+engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
+
+#get the cases from hades 
+df_db = pd.read_sql("SELECT * FROM advert where category in ('suspected counterfeiter','takedown' )", engine)
+
+for index,row in df_db.iterrows():
+
+    if row['category']=='takedown': 
+        
+        casePayload={
+
+        "region": row['region'],
+        "country": row['country'],
+        "businessUnit": row['business'],
+        "OffenceType": "Online Counterfeit",
+        "incidentDescription": "TAKEDOWN request - date found : " + str(row['date_found'])+
+        " | Product Title: "+ str(row['date_found'] ) + 
+        " | Seller Name: Daves chems" + str( row['seller']) +
+        " | url: "+ str( row['url'])
+        }
+
+
+
 
 
 # Creates header for OAuth request
@@ -16,17 +52,6 @@ caseUrl='https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v
 headers={'Authorization':'Bearer '+ str(response['access_token']),'Content-Type':'text/plain'}
 print(headers)
 
-#country has to have a capital 
-casePayload={
-
-    "region": "EAME",
-    "country": "Germany",
-    "businessUnit": "Seeds",
-    "OffenceType": "Online Counterfeit",
-    "incidentDescription": "Hades Upload Found: 20/11/2020 | site: ebay.com|  Product Title: crap advion  | Seller Name: Daves chems | url: https://www.w3schools.com/css/default.asp"
-    }
-
-
 
 try :
     r=requests.post(url=caseUrl,headers=headers,json=casePayload)
@@ -36,6 +61,6 @@ except:
 
 if r.json()['taskId']=="0":
     
-    print("case was not added please check the payload. Make sure data is correct e.g Country has a capital")
+    print("case was not added please check the payload. Maybe you forgot to make sure everyhting is capitilised")
 else:
     print(r.text)
