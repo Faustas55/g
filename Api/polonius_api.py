@@ -12,8 +12,22 @@ import requests
 from sqlalchemy import create_engine
 import pandas as pd
 
+
+# Creates header for OAuth request
+url='https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?'
+payload={'client_secret':'TbKs0R3e@A6V!p6c^Wq6CdPc','client_id':'publicRestCall', 'grant_type':'client_credentials'}
+
+# request a token for access 
+r=requests.post(url,data=payload)
+token=str(r.json()['access_token'])
+
+#setup API url and associated headers 
+caseUrl='https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct'
+headers={'Authorization':'Bearer '+ token,'Content-Type':'text/plain'}
+
+
 #create the connection to the database 
-engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
+engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
 
 #get the cases from hades 
 df_db = pd.read_sql("SELECT * FROM advert where category in ('suspected counterfeiter','takedown' )", engine)
@@ -35,32 +49,25 @@ for index,row in df_db.iterrows():
         }
 
 
+        try :
+             r=requests.post(url=caseUrl,headers=headers,json=casePayload)
+
+        except:
+            print("There has been a problem uploading case data")
+
+        if r.json()['taskId']=="0":
+            
+            print("case was not added please check the payload. Maybe you forgot to make sure everyhting is capitilised")
+        else:
+            print(r.text)
 
 
 
-# Creates header for OAuth request
-url='https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?'
-payload={'client_secret':'TbKs0R3e@A6V!p6c^Wq6CdPc','client_id':'publicRestCall', 'grant_type':'client_credentials'}
 
 
-# request a token for access 
-r=requests.post(url,data=payload)
-response=r.json()
-print(response['access_token'])
-
-caseUrl='https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct'
-headers={'Authorization':'Bearer '+ str(response['access_token']),'Content-Type':'text/plain'}
-print(headers)
 
 
-try :
-    r=requests.post(url=caseUrl,headers=headers,json=casePayload)
 
-except:
-    print("There has been a problem uploading case data")
 
-if r.json()['taskId']=="0":
-    
-    print("case was not added please check the payload. Maybe you forgot to make sure everyhting is capitilised")
-else:
-    print(r.text)
+
+
