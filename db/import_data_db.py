@@ -10,21 +10,21 @@
 
 # TODO check if seller and domain is in the database if so then update previous category
 
-# TODO check if selelr and domain are etc etc
 
 
-import pandas as pd
-import numpy as np
+
 import datetime
 
-from sqlalchemy.types import Integer, Text
+import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
+from sqlalchemy.types import Integer, Text
 
 engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
 
 
 # we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 11:00am Basel time)
-import_file = "C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv"
+import_file = "C:\\Program Files\\Splunk\\var\\run\\splunk\\csv\\splunk_online_output.csv"
 
 # debugging and test purposes
 import_file = "C:\\temp\\online.csv"
@@ -35,7 +35,7 @@ df_region = pd.read_csv(
 )
 
 # We can continue with this intially if we have problems importing with pandas we can use the GUI to import
-export_file = "c:\sqlite\db\online_transformed.csv"
+export_file = "c:\\sqlite\\db\\online_transformed.csv"
 
 # These are the columns only needed for the export to csv file
 export_cols = [
@@ -117,7 +117,7 @@ df_merge_nr = df_notrelevant.merge(
     df, how="outer", indicator=True, on=["seller", "domain"]
 )
 df = df_merge_nr[df_merge_nr["_merge"] == "right_only"]
-print(df.shape)
+
 
 # drop some more useless columns before we merge again
 df.drop(["score", "set_category", "_merge"], axis=1, inplace=True)
@@ -126,15 +126,11 @@ df.drop(["score", "set_category", "_merge"], axis=1, inplace=True)
 df_merge = df_db.merge(
     df, indicator=True, how="outer", on=["seller", "product", "domain"]
 )
-print(df.columns)
 
-
-# merge with df_not relevant to get rid of non relevant sellers
-# df_nr = df_merge.merge(df_notrelevant,indicator=True,how='outer',on=['seller','product','domain'])
 
 # take only the right sided ones . these are adverts that are not in the sqlite database ..i.e the new ones
 df = df_merge[df_merge["_merge"] == "right_only"]
-print(df.shape)
+
 
 
 # check to see if we have any new adverts before proceeding
@@ -174,4 +170,3 @@ else:
         index=False,
         dtype={"business": Text(), "product_brand": Text()},
     )
-
