@@ -11,8 +11,17 @@
 import requests
 from sqlalchemy import create_engine
 import pandas as pd
-from Models import Advert
+import logging
 
+#set limit of how many can be done at once this is only temporary
+limit=20
+
+
+#set logging
+logging.basicConfig(filename='hadesv2.log',level=logging.INFO,format='%(asctime)s %(levelname)s: %(message)s', 
+                        datefmt='%m/%d/%Y %I:%M:%S %p'
+
+                    )
 
 #define globals
 caseUrl='https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct'
@@ -56,13 +65,16 @@ def send_data(headers,caseUrl,casePayload):
              r=requests.post(url=caseUrl,headers=headers,json=casePayload)
 
     except:
-            return("There has been a problem uploading case data")
+            logging.error("There is a problem with connecting to the API")
+            return False
 
     if r.json()['taskId']=="0":
             
-            return("case was not added please check the payload. Maybe you forgot to make sure everyhting is capitilised")
+            logging.error("case was not added please check the payload. ")
+            return False
     else:
             return(r.json())
+            
 
 
 
@@ -76,20 +88,39 @@ engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
 sql="SELECT * FROM advert where category in ('takedown' ) and polonius_caseid is null "
 df_db = pd.read_sql(sql, engine)
 
-
-#get header for API 
-header=get_header()
-
-
-#send to polonius the cases  
-for index,row in df_db.iterrows():
-    casePayload=get_casePayload(row)
-    caseId=send_data(caseUrl=caseUrl,headers=header,casePayload=casePayload)
+if df_db.empty:
     
-    df_db.loc[index:'polonius_caseid']=caseId['referenceNumber']
+    logging.info(' No records to send to polonius')
+
+elif df_db.size>limit: 
+    logging.warning('over 20 records to send please check')
+
+else:
+    #get header for API 
+    header=get_header()
+
+
+    #send to polonius the cases  
+    for index,row in df_db.iterrows():
+        casePayload=get_casePayload(row)
+        caseId=send_data(caseUrl=caseUrl,headers=header,casePayload=casePayload)
+        logging.info('caseId : %s',caseId)
+        if caseId: 
     
+         #update sql
+            try:
+                sql='update advert set polonius_caseid='+ str(caseId['referenceNumber']) + ' where advert_id='+str(row['advert_id'])
+            
+            
+                with engine.connect() as con:
+                
+                    result = con.execute(sql)
+
+            except: 
+                    print('could not connect to sqlite database to update polonius_caseId')
+                    logging.error('could not connect to sqlite database to update polonius_caseId')
+
     
-    print(caseId['referenceNumber'])
 
 
         
