@@ -1,4 +1,11 @@
 #this is the script to take the suspected and takedown cases and import into polonius 
+#It has a limit to stop a crazy amount of cases being added by mistake, default is 20 
+#run the script with for example to set a limit of 40 cases ..polonius_api.py -c 40 
+# polonius_api -h will display this help.
+#
+#Logging is turned on and is called hades.log 
+
+
 
 # TODO get the relevant cases from the hades database into casepayload -DONE
 # TODO captilize everything before sending - ATIKESH
