@@ -1,9 +1,9 @@
 #this is the script to take the suspected and takedown cases and import into polonius 
 
 # TODO get the relevant cases from the hades database into casepayload -DONE
-# TODO captilize everything before sending
+# TODO captilize everything before sending - ATIKESH
 # TODO update database with relevant Polonius case number -DONE
-# TODO Add is system variable for number of case to upload
+# TODO Add is system variable for number of case to upload -DONE
 
 
 
@@ -78,7 +78,7 @@ def send_data(headers,caseUrl,casePayload):
 
     if r.json()['taskId']=="0":
             
-            logging.error("case was not added please check the payload. ")
+            logging.error("case was not added please check the payload %s ", casePayload)
             return False
     else:
             return(r.json())
@@ -101,7 +101,7 @@ if df_db.empty:
     logging.info(' No records to send to polonius')
 
 elif df_db.size > limit:
-    logging.warning('over limit of %s records to process please check',str(limit))
+    logging.warning('%s cases to process with a limit of %s cases. Please confirm these number of cases are correct',str(df_db.size),str(limit))
 
 else:
     #get header for API 
