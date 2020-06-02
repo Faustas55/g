@@ -1,9 +1,9 @@
 #this is the script to take the suspected and takedown cases and import into polonius 
 
-# TODO get the relevant cases from the hades database into casepayload
+# TODO get the relevant cases from the hades database into casepayload -DONE
 # TODO captilize everything before sending
-# TODO update database with relevant Polonius case number 
-
+# TODO update database with relevant Polonius case number -DONE
+# TODO Add is system variable for number of case to upload
 
 
 
@@ -12,9 +12,17 @@ import requests
 from sqlalchemy import create_engine
 import pandas as pd
 import logging
+import argparse
 
-#set limit of how many can be done at once this is only temporary
-limit=20
+#set limit of how many cases can be processed at one time e.g -c 20 
+#If the 
+parser = argparse.ArgumentParser(description='Number of cases to process and send to Polonius via API')
+parser.add_argument('-c', type=int,
+                  help='This sets the limit of cases to process', default=20)
+args=parser.parse_args()
+limit=args.c
+
+
 
 
 #set logging
@@ -92,8 +100,8 @@ if df_db.empty:
     
     logging.info(' No records to send to polonius')
 
-elif df_db.size>limit: 
-    logging.warning('over 20 records to send please check')
+elif df_db.size > limit:
+    logging.warning('over limit of %s records to process please check',str(limit))
 
 else:
     #get header for API 
@@ -104,21 +112,22 @@ else:
     for index,row in df_db.iterrows():
         casePayload=get_casePayload(row)
         caseId=send_data(caseUrl=caseUrl,headers=header,casePayload=casePayload)
-        logging.info('caseId : %s',caseId)
+        logging.info('sent case via API caseId : %s',caseId)
+        
         if caseId: 
     
          #update sql
             try:
                 sql='update advert set polonius_caseid='+ str(caseId['referenceNumber']) + ' where advert_id='+str(row['advert_id'])
-            
-            
-                with engine.connect() as con:
                 
+                with engine.connect() as con:
                     result = con.execute(sql)
-
             except: 
-                    print('could not connect to sqlite database to update polonius_caseId')
-                    logging.error('could not connect to sqlite database to update polonius_caseId')
+                    print('could not connect to sqlite database to update polonius_caseId ,see log')
+                    logging.error('could not connect to sqlite database to update polonius_caseId with advert_id: %s',str(row['advert_id'] ))
+        else:
+                    logging.error('Problem with the Polonius API for advert_id: %s',str(row['advert_id'] ))
+
 
     
 
