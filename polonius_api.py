@@ -8,9 +8,10 @@
 
 
 # TODO get the relevant cases from the hades database into casepayload -DONE
-# TODO captilize everything before sending - ATIKESH
+# TODO captilize everything before sending - ATIKESH version 2.1
 # TODO update database with relevant Polonius case number -DONE
 # TODO Add is system variable for number of case to upload -DONE
+# TODO Limit only suspected cases ,unlimited for takedowns -DONE
 
 
 
