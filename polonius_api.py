@@ -48,9 +48,14 @@ def get_header():
     payload={'client_secret':'TbKs0R3e@A6V!p6c^Wq6CdPc','client_id':'publicRestCall', 'grant_type':'client_credentials'}
 
     # request a token for access 
-    r=requests.post(url,data=payload)
-    token=str(r.json()['access_token'])
+    try: 
+        r=requests.post(url,data=payload)
+        
+    except:
+        logging.error('can not reach polonius server and exchange certificates')
+        return False
 
+    token=str(r.json()['access_token'])
     #setup API associated headers 
     return {'Authorization':'Bearer '+ token,'Content-Type':'text/plain'}
 
@@ -99,41 +104,52 @@ def send_data(headers,caseUrl,casePayload):
 engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
 
 #get the cases from hades 
-#sql="SELECT * FROM advert where category in ('suspected counterfeiter','takedown' ) and polonius_caseid is null "
-sql="SELECT * FROM advert where category in ('takedown' ) and polonius_caseid is null "
+sql="SELECT * FROM advert where category in ('suspected counterfeiter','takedown' ) and polonius_caseid is null "
+#sql="SELECT * FROM advert where category in ('takedown' ) and polonius_caseid is null "
 df_db = pd.read_sql(sql, engine)
+count_suspected=len(df_db[df_db['category']=='suspected counterfeiter'].index)
+
 
 if df_db.empty:
     
     logging.info(' No records to send to polonius')
 
-elif df_db.size > limit:
-    logging.warning('%s cases to process with a limit of %s cases. Please confirm these number of cases are correct',str(df_db.size),str(limit))
-
 else:
+
+    if count_suspected > limit:
+
+        #takedowns are unlimited onlz stop suspected counterfeiters of above the limit 
+        df_db=df_db[df_db['category']=='takedown']
+
+        logging.warning('%s suspected cases to process with a limit of %s cases. Please confirm these number of suspected cases are correct',
+        str(count_suspected),str(limit))
+
+
     #get header for API 
-    header=get_header()
-
-
-    #send to polonius the cases  
-    for index,row in df_db.iterrows():
-        casePayload=get_casePayload(row)
-        caseId=send_data(caseUrl=caseUrl,headers=header,casePayload=casePayload)
-        logging.info('sent case via API caseId : %s',caseId)
-        
-        if caseId: 
     
-         #update sql
-            try:
-                sql='update advert set polonius_caseid='+ str(caseId['referenceNumber']) + ' where advert_id='+str(row['advert_id'])
-                
-                with engine.connect() as con:
-                    result = con.execute(sql)
-            except: 
+    header=get_header()
+    if header:
+       
+        #send to polonius the cases  
+
+        for index,row in df_db.iterrows():
+            casePayload=get_casePayload(row)
+            caseId=send_data(caseUrl=caseUrl,headers=header,casePayload=casePayload)
+            logging.info('sent case via API caseId : %s',caseId)
+            
+            if caseId: 
+        
+            #update sql
+                try:
+                    sql='update advert set polonius_caseid='+ str(caseId['referenceNumber']) + ' where advert_id='+str(row['advert_id'])
+                    
+                    with engine.connect() as con:
+                            result = con.execute(sql)
+                except: 
                     print('could not connect to sqlite database to update polonius_caseId ,see log')
                     logging.error('could not connect to sqlite database to update polonius_caseId with advert_id: %s',str(row['advert_id'] ))
-        else:
-                    logging.error('Problem with the Polonius API for advert_id: %s',str(row['advert_id'] ))
+            else:
+                logging.error('Problem with the Polonius API for advert_id: %s',str(row['advert_id'] ))
 
 
     
