@@ -8,7 +8,7 @@
 
 # TODO check if seller and domain is a false positive if yes do not import and discard = Rich -DONE
 
-# TODO check if seller and domain is in the database if so then update previous category
+# TODO check if seller and domain is in the database if so then update previous category next sprint v2.1
 
 
 
