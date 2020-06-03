@@ -4,5 +4,60 @@ Help
 {% endblock %}
 {% block content %}
 <strong>The help page</strong>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
 
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+<h2>Hades v2 Categories: What do they mean?</h2>
+
+<table style="width:150%", border=1
+  <tr>
+    <th>Category</th>
+    <th>Action</th> 
+    <th>Explanation</th>
+  </tr>
+  <tr>
+    <td>Suspected Counterfeiter</td>
+    <td>A case is opened in Polonious</td>
+    <td>A test purchase will be conducter for the case that is opened in Polonious</td>
+  </tr>
+  <tr>
+    <td>Takedown</td>
+    <td>A case is opened in Polonious</td>
+    <td>The case that is opened in Polonious, followed by a takedown of the advert</td>
+  </tr>
+  <tr>
+    <td>Not Relevant</td>
+    <td>Deletes all adverts for that seller for that e-commerce site</td>
+    <td>Applies to all adverts placed by the seller in the future. No adverts will be seen from this seller</td>
+  </tr>
+<tr>
+    <td>Syngenta Authorised</td>
+    <td>Whitelist adverts by this seller</td>
+    <td>New adverts will not appear for review, but will be kept in the database</td>
+  </tr>
+<tr>
+    <td>No Action</td>
+    <td>Deletes this particular advert</td>
+    <td>A particular advert will be deleted, but other adverts from the seller will appear for review</td>
+  </tr>
+</table>
+
+</body>
 {% endblock %}
