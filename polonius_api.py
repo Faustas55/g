@@ -1,6 +1,8 @@
 #this is the script to take the suspected and takedown cases and import into polonius 
-#It has a limit to stop a crazy amount of cases being added by mistake, default is 20 
-#run the script with for example to set a limit of 40 cases ..polonius_api.py -c 40 
+#It has a limit to stop a crazy amount of suspected cases being added by mistake, default is 20 
+#an unlimited number of takedown cases can be sent to polonius 
+##########################
+#run the script with for example to set a limit of 40 suspected cases ..polonius_api.py -c 40 
 # polonius_api -h will display this help.
 #
 #Logging is turned on and is called hades.log 
@@ -22,8 +24,12 @@ import pandas as pd
 import logging
 import argparse
 
-#set limit of how many cases can be processed at one time e.g -c 20 
-#If the 
+
+#define globals
+caseUrl='https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct'
+
+
+#get any optional arguments e.g polonius_api.py -c 20
 parser = argparse.ArgumentParser(description='Number of cases to process and send to Polonius via API')
 parser.add_argument('-c', type=int,
                   help='This sets the limit of cases to process', default=20)
@@ -31,19 +37,16 @@ args=parser.parse_args()
 limit=args.c
 
 
-
-
-#set logging
+#set logging up
 logging.basicConfig(filename='hadesv2.log',level=logging.INFO,format='%(asctime)s %(levelname)s: %(message)s', 
                         datefmt='%m/%d/%Y %I:%M:%S %p'
 
                     )
 
-#define globals
-caseUrl='https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct'
 
 
-def get_header():
+#get the authorisation token 
+def get_token():
     # Creates header for OAuth request
     url='https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?'
     payload={'client_secret':'TbKs0R3e@A6V!p6c^Wq6CdPc','client_id':'publicRestCall', 'grant_type':'client_credentials'}
@@ -61,6 +64,7 @@ def get_header():
     return {'Authorization':'Bearer '+ token,'Content-Type':'text/plain'}
 
 
+#payload is the case data to send to polonius
 def get_casePayload(row):
     return {
 
@@ -68,7 +72,7 @@ def get_casePayload(row):
         "country": row['country'],
         "businessUnit": row['business'],
         "OffenceType": "Online Counterfeit",
-        "incidentDescription":  "HADES UPLOAD:"+ str(row['category']) + " - date found : " + str(row['date_found'])+
+        "incidentDescription":  "HADES UPLOAD:  "+ str(row['category']) + " - date found : " + str(row['date_found'])+
         " | Product Title: "+ str(row['product'] ) + 
         " | Seller Name: " + str( row['seller']) +
         " | url: "+ str( row['url'])
@@ -79,7 +83,7 @@ def get_casePayload(row):
 
 
 
-
+#send all ze data to polonius 
 def send_data(headers,caseUrl,casePayload):
 
     try :
@@ -100,13 +104,13 @@ def send_data(headers,caseUrl,casePayload):
 
 
 
-#Start of main program 
+################Start of main program ##########
 #create the connection to the database 
 engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
 
-#get the cases from hades 
+#get the suspected & takedown cases from hades which have no polonius case number
 sql="SELECT * FROM advert where category in ('suspected counterfeiter','takedown' ) and polonius_caseid is null "
-#sql="SELECT * FROM advert where category in ('takedown' ) and polonius_caseid is null "
+
 df_db = pd.read_sql(sql, engine)
 count_suspected=len(df_db[df_db['category']=='suspected counterfeiter'].index)
 
@@ -128,15 +132,15 @@ else:
 
     #get header for API 
     
-    header=get_header()
-    if header:
+    token=get_token()
+    if token:
        
         #send to polonius the cases  
 
         for index,row in df_db.iterrows():
             casePayload=get_casePayload(row)
-            caseId=send_data(caseUrl=caseUrl,headers=header,casePayload=casePayload)
-            logging.info('sent case via API caseId : %s',caseId)
+            caseId=send_data(caseUrl=caseUrl,headers=token,casePayload=casePayload)
+            logging.info('sent case advert_id %s via API and got casenumber : %s',str(row['advert_id']),str(caseId['referenceNumber']))
             
             if caseId: 
         
