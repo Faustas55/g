@@ -12,7 +12,7 @@
 
 
 
-
+import sys
 import datetime
 import logging
 import numpy as np
@@ -33,22 +33,25 @@ def set_logging(name,level):
     return(logger)
 
 
-
-
-
 logger=set_logging('IMPORT DATA','INFO')
 
 
 #opening a connection to the database. Update with a correct path directory
-MainCon=sqlite3.connect('')
+MainCon=sqlite3.connect('HadesV2App\\db\\hades.db')
 
 #opening a connection to the backup file
 BackupCon=sqlite3.connect('C:\\Backup\\Hades\\hades_backup.db')
 
 #backup
-with BackupCon:
-    MainCon.backup(BackupCon, pages=0)
-    
+
+try:
+    with BackupCon:
+        MainCon.backup(BackupCon, pages=0)
+
+except:
+    logger.error('database has not been backed up')
+    sys.exit()
+
 #closing connections 
 MainCon.close()
 BackupCon.close()
