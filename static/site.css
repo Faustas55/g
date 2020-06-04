@@ -118,7 +118,19 @@ a:active {
 
 }
 
+.help{
 
+  background-color: #cbf1f5;
+    border: 1px dotted #71c9ce;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    padding-right:10px;
+    font-size: 0.9em;
+
+}
   
   button{
     color: navy;
@@ -145,4 +157,20 @@ a:active {
     flex-direction: row;
   }
 
+  table{
+    color:navy;
+    border-collapse: collapse;
+    width: 90%;
+    background-color: #cbf1f5;
+    font-size: 0.8em;
+  }
 
+td, th {
+  border: 1px solid navy;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color:#a6e3e9;
+}
