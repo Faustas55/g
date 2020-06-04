@@ -17,11 +17,28 @@ import datetime
 
 import numpy as np
 import pandas as pd
+import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.types import Integer, Text
 
+#opening a connection to the database. Update with a correct path directory
+MainCon=sqlite3.connect('')
+
+#opening a connection to the backup file
+BackupCon=sqlite3.connect('C:\\Backup\\Hades\\hades_backup.db')
+
+#backup
+with BackupCon:
+    MainCon.backup(BackupCon, pages=0)
+    
+#closing connections 
+MainCon.close()
+BackupCon.close()
+
+
 engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
 
+   
 
 # we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 11:00am Basel time)
 import_file = "C:\\Program Files\\Splunk\\var\\run\\splunk\\csv\\splunk_online_output.csv"
