@@ -37,11 +37,16 @@ args=parser.parse_args()
 limit=args.c
 
 
+def set_logging(name,level):
 #set logging up
-logging.basicConfig(filename='hadesv2.log',level=logging.INFO,format='%(asctime)s %(levelname)s: %(message)s', 
-                        datefmt='%m/%d/%Y %I:%M:%S %p'
-
-                    )
+    logger=logging.getLogger(name)
+    logger.setLevel(level)
+    filelog = logging.FileHandler('hadesv2.log')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p')
+    filelog.setFormatter(formatter)
+    logger.addHandler(filelog)
+    return(logger)
+   
 
 
 
@@ -56,7 +61,7 @@ def get_token():
         r=requests.post(url,data=payload)
         
     except:
-        logging.error('can not reach polonius server and exchange certificates')
+        logger.error('can not reach polonius server and exchange certificates')
         return False
 
     token=str(r.json()['access_token'])
@@ -90,12 +95,12 @@ def send_data(headers,caseUrl,casePayload):
              r=requests.post(url=caseUrl,headers=headers,json=casePayload)
 
     except:
-            logging.error("There is a problem with connecting to the API")
+            logger.error("There is a problem with connecting to the API")
             return False
 
     if r.json()['taskId']=="0":
             
-            logging.error("case was not added please check the payload %s ", casePayload)
+            logger.error("case was not added please check the payload %s ", casePayload)
             return False
     else:
             return(r.json())
@@ -105,6 +110,10 @@ def send_data(headers,caseUrl,casePayload):
 
 
 ################Start of main program ##########
+#set the log
+logger=set_logging('API','INFO')
+
+
 #create the connection to the database 
 engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
 
@@ -117,7 +126,7 @@ count_suspected=len(df_db[df_db['category']=='suspected counterfeiter'].index)
 
 if df_db.empty:
     
-    logging.info(' No records to send to polonius')
+    logger.info(' No records to send to polonius')
 
 else:
 
@@ -126,7 +135,7 @@ else:
         #takedowns are unlimited onlz stop suspected counterfeiters of above the limit 
         df_db=df_db[df_db['category']=='takedown']
 
-        logging.warning('%s suspected cases to process with a limit of %s cases. Please confirm these number of suspected cases are correct',
+        logger.warning('%s suspected cases to process with a limit of %s cases. Please confirm these number of suspected cases are correct',
         str(count_suspected),str(limit))
 
 
@@ -140,7 +149,7 @@ else:
         for index,row in df_db.iterrows():
             casePayload=get_casePayload(row)
             caseId=send_data(caseUrl=caseUrl,headers=token,casePayload=casePayload)
-            logging.info('sent case advert_id %s via API and got casenumber : %s',str(row['advert_id']),str(caseId['referenceNumber']))
+            logger.info('sent case advert_id %s via API and got casenumber : %s',str(row['advert_id']),str(caseId['referenceNumber']))
             
             if caseId: 
         
@@ -152,9 +161,9 @@ else:
                             result = con.execute(sql)
                 except: 
                     print('could not connect to sqlite database to update polonius_caseId ,see log')
-                    logging.error('could not connect to sqlite database to update polonius_caseId with advert_id: %s',str(row['advert_id'] ))
+                    logger.error('could not connect to sqlite database to update polonius_caseId with advert_id: %s',str(row['advert_id'] ))
             else:
-                logging.error('Problem with the Polonius API for advert_id: %s',str(row['advert_id'] ))
+                logger.error('Problem with the Polonius API for advert_id: %s',str(row['advert_id'] ))
 
 
     
