@@ -14,11 +14,27 @@
 
 
 import datetime
-
+import logging
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.types import Integer, Text
+
+#set up logging
+def set_logging(name,level):
+    logger=logging.getLogger(name)
+    logger.setLevel(level)
+    filelog = logging.FileHandler('hadesv2.log')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p')
+    filelog.setFormatter(formatter)
+    logger.addHandler(filelog)
+    return(logger)
+
+
+
+
+
+logger=set_logging('IMPORT DATA','INFO')
 
 engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
 
@@ -103,24 +119,17 @@ df_db = pd.read_sql("SELECT * FROM advert", engine)
 df = pd.read_csv(import_file)
 # print(df.head())
 
-# get non-relevant sellers
-df_notrelevant = df_db[df_db["category"] == "not relevant"][["seller", "domain"]]
+
+#get a list of sellers with their past categories
+df_categories = df_db[["seller", "domain","category"]]
+df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
 
 # merging df with country and region database, renaming the column back into "region" - F
 df = pd.merge(df, df_region, on="country", how="left")
 df = df.rename(columns={"region_y": "region"})
-print(df.shape)
-
-
-# get rid of non -relevant sellers adverts
-df_merge_nr = df_notrelevant.merge(
-    df, how="outer", indicator=True, on=["seller", "domain"]
-)
-df = df_merge_nr[df_merge_nr["_merge"] == "right_only"]
-
 
 # drop some more useless columns before we merge again
-df.drop(["score", "set_category", "_merge"], axis=1, inplace=True)
+df.drop(["score", "set_category"], axis=1, inplace=True)
 
 # merge so we only get new adverts .New adverts=new seller + domain + product
 df_merge = df_db.merge(
@@ -128,19 +137,29 @@ df_merge = df_db.merge(
 )
 
 
+
 # take only the right sided ones . these are adverts that are not in the sqlite database ..i.e the new ones
 df = df_merge[df_merge["_merge"] == "right_only"]
 
-
-
 # check to see if we have any new adverts before proceeding
-if df.empty:
-    print("No new adverts found ")
-
-else:
-
+if not df.empty:
     # drop all the useless columns created by the merge .. i.e the adverts already in database
     df.drop(columns_drop, axis=1, inplace=True)
+    
+
+    # rename the columns so it fits the table fields in sqlite
+    df = df.rename(columns=rename_cols)
+
+    df= pd.merge(df, df_categories, on=['seller','domain'], how="left")
+    df['category']=df['category_y']
+    df.drop(['category_y','category_x'],axis=1,inplace=True)
+
+  
+    
+
+    logger.info('number of new cases to upload %s',df.shape[0])
+    
+  
 
     # this is for SQLite rowid which is a primary key, send in a null object and sqlite will sort this out
     df.loc[:, "advert_id"] = None
@@ -153,11 +172,14 @@ else:
     # and when uploaded
     df.loc[:, "updated_date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # rename the columns so it fits the table columns
-    df = df.rename(columns=rename_cols)
+    
 
     # set category to lowercase
     df["category"] = df["category"].str.lower()
+
+    # get rid of non -relevant sellers adverts
+
+    df=df[df['category'] != 'not relevant']
 
     # write out the csv to be uploaded ..this is now just a backup
    
@@ -170,3 +192,5 @@ else:
         index=False,
         dtype={"business": Text(), "product_brand": Text()},
     )
+else:
+    logger.info("No new adverts found ")
