@@ -2,17 +2,19 @@ body{
     height:100%;
     width:100%;
     background-color: #e3fdfd;
+    
 }
-
 
 
 .navbar {
-    background-color: lightslategray;
-    font-size: 1em;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    color: white;
-    padding: 8px 5px 8px 5px;
+  font-size: 0.8em;
+  background-color: #71c9ce;
+  padding: 10px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  color: white;
 }
+
+
 
 .navbar a {
     text-decoration: none;
@@ -49,7 +51,9 @@ a:active {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background-color: #e3fdfd;
+    min-height: 100vh;
+    background: linear-gradient(rgba(203, 241, 245, 0.85), rgba(227, 253, 253, 0.8)),
+                  url('IMG_2011.JPG') 0% 0%/cover no-repeat;
     font-family: Arial, Helvetica, sans-serif;
     margin: 0px;
     color: navy;
@@ -65,12 +69,6 @@ a:active {
   
   }
   
-  .navbar {
-    font-size: 0.8em;
-    background-color: #71c9ce;
-    padding: 10px;
-  
-  }
   
 
 
