@@ -23,6 +23,10 @@ import logging
 import argparse
 
 
+
+# create the connection to the database
+engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
+
 # define globals
 caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct"
 infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProductInf"
