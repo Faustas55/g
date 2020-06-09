@@ -25,7 +25,7 @@ import argparse
 
 
 # create the connection to the database
-engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
+engine = create_engine("sqlite:///db/hades.db", echo=False)
 
 # define globals
 caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct"
@@ -85,15 +85,15 @@ def get_casePayload(row):
         "country": row["country"],
         "businessUnit": row["business"],
         "OffenceType": "Online Counterfeit",
-        "incidentDescription": "HADES UPLOAD:  "
+        "incidentDescription": "HADES UPLOAD: "
         + str(row["category"])
-        + " - date found : "
+        + " \n\n date found : "
         + str(row["date_found"])
-        + " | Product Title: "
+        + " \n Product Title: "
         + str(row["product"])
-        + " | Seller Name: "
+        + " \n Seller Name: "
         + str(row["seller"])
-        + " | url: "
+        + " \n\n url: "
         + str(row["url"]),
     }
 
@@ -121,8 +121,6 @@ def send_data(headers, Url, casePayload):
 logger = set_logging("API", "INFO")
 
 
-# create the connection to the database
-engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=False)
 
 # get the suspected & takedown cases from hades which have no polonius case number
 sql = "SELECT * FROM advert where category in ('suspected counterfeiter','takedown' ) and polonius_caseid is null "
