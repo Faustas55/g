@@ -20,7 +20,11 @@ import pandas as pd
 import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.types import Integer, Text
+from pathlib import Path
 
+
+#set up database path 
+db_path=Path.cwd().joinpath('db', 'hades.db')
 
 #set up logging
 def set_logging(name,level):
@@ -37,10 +41,10 @@ logger=set_logging('IMPORT DATA','INFO')
 
 
 #opening a connection to the database. Update with a correct path directory
-MainCon=sqlite3.connect('HadesV2App\\db\\hades.db')
+MainCon=sqlite3.connect(db_path)
 
 #opening a connection to the backup file
-BackupCon=sqlite3.connect('C:\\Backup\\Hades\\hades_backup.db')
+BackupCon=sqlite3.connect(Path.cwd.joinpath('db', 'hades_backup.db'))
 
 #backup
 
@@ -63,18 +67,18 @@ engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
    
 
 # we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 11:00am Basel time)
-import_file = "C:\\Program Files\\Splunk\\var\\run\\splunk\\csv\\splunk_online_output.csv"
+import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
 # debugging and test purposes
-import_file = "C:\\temp\\online.csv"
+#import_file = "C:\\temp\\online.csv"
 
 # importing a file with countries and regions that will be joined with the main database - F
 df_region = pd.read_csv(
-    "c:\\sqlite\\db\\regioncountry.csv", keep_default_na=False, na_values=["_"]
+    Path.cwd().joinpath('db', 'regioncountry.csv'), keep_default_na=False, na_values=["_"]
 )
 
 # We can continue with this intially if we have problems importing with pandas we can use the GUI to import
-export_file = "c:\\sqlite\\db\\online_transformed.csv"
+export_file = Path.cwd().joinpath('db', 'online_transformed.csv')
 
 # These are the columns only needed for the export to csv file
 export_cols = [
