@@ -123,7 +123,7 @@ logger = set_logging("API", "INFO")
 
 
 # get the suspected & takedown cases from hades which have no polonius case number
-sql = "SELECT * FROM advert where category in ('suspected counterfeiter','takedown' ) and polonius_caseid is null "
+sql = "SELECT * FROM advert where category in ('suspected counterfeiter','takedown' ) and polonius_caseid is null and updated_by !='upload' "
 
 df_db = pd.read_sql(sql, engine)
 count_suspected = len(df_db[df_db["category"] == "suspected counterfeiter"].index)
