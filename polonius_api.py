@@ -207,7 +207,12 @@ else:
                         str(row["advert_id"]),
                     )
             else:
+                
+                print("problem with sending case to polonius ..see log")
+                
                 logger.error(
                     "Problem with the Polonius API for advert_id: %s",
                     str(row["advert_id"]),
                 )
+    else:
+        print("problem getting token to access API --see log for details")
