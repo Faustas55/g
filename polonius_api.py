@@ -27,11 +27,17 @@ import argparse
 # create the connection to the database
 engine = create_engine("sqlite:///db/hades.db", echo=False)
 
-# define globals
-caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct"
-infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProductInf"
-tokenurl="https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
+# define globals development
+#caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct"
+#infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProductInf"
+#tokenurl="https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
+#secret="TbKs0R3e@A6V!p6c^Wq6CdPc"
 
+# define globals production
+infringUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProductInf"
+tokenurl="https://syngenta.poloniouslive.com/syngenta/pcmsrest/oauth/token?"
+caseUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProduct"
+secret="D2s8tFJh79cxrQnUmyjNrZ69"
 
 # get any optional arguments e.g polonius_api.py -c 20
 parser = argparse.ArgumentParser(
@@ -58,14 +64,17 @@ def set_logging(name, level):
     return logger
 
 # get the authorisation token
-def get_token(url):
+def get_token(url,secret):
     # Creates header for OAuth request
     
     payload = {
-        "client_secret": "TbKs0R3e@A6V!p6c^Wq6CdPc",
+        "client_secret": secret,
         "client_id": "publicRestCall",
         "grant_type": "client_credentials",
     }
+
+
+
 
     # request a token for access
     try:
@@ -93,7 +102,7 @@ def get_casePayload(row):
         + str(row["date_found"])
         + " \n Product Title: "
         + str(row["product"])
-        + " \n Seller Name: "
+        + " \n\n Seller Name: "
         + str(row["seller"])
         + " \n\n url: "
         + str(row["url"]),
@@ -156,7 +165,7 @@ else:
 
     # get header for API
 
-    token = get_token(tokenurl)
+    token = get_token(tokenurl,secret)
     if token:
 
         # send to polonius the cases
