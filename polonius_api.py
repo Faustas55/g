@@ -30,6 +30,8 @@ engine = create_engine("sqlite:///db/hades.db", echo=False)
 # define globals
 caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct"
 infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProductInf"
+tokenurl="https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
+
 
 # get any optional arguments e.g polonius_api.py -c 20
 parser = argparse.ArgumentParser(
@@ -56,9 +58,9 @@ def set_logging(name, level):
     return logger
 
 # get the authorisation token
-def get_token():
+def get_token(url):
     # Creates header for OAuth request
-    url = "https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
+    
     payload = {
         "client_secret": "TbKs0R3e@A6V!p6c^Wq6CdPc",
         "client_id": "publicRestCall",
@@ -148,7 +150,7 @@ else:
 
     # get header for API
 
-    token = get_token()
+    token = get_token(tokenurl)
     if token:
 
         # send to polonius the cases
