@@ -100,6 +100,13 @@ def get_casePayload(row):
     }
 
 
+def get_cases(category,Notthisuser):
+    categories=",".join(category)
+    sql = f"SELECT * FROM advert where category in ({categories}) and polonius_caseid is null and updated_by !={Notthisuser} "
+
+    return pd.read_sql(sql, engine)
+
+
 # send all ze data to polonius
 def send_data(headers, Url, casePayload):
     try:
@@ -125,9 +132,8 @@ logger = set_logging("API", "INFO")
 
 
 # get the suspected & takedown cases from hades which have no polonius case number
-sql = "SELECT * FROM advert where category in ('suspected counterfeiter','takedown' ) and polonius_caseid is null and updated_by !='upload' "
+df_db=get_cases(category=['"suspected counterfeiter"','"takedown"'],Notthisuser='"upload"')
 
-df_db = pd.read_sql(sql, engine)
 count_suspected = len(df_db[df_db["category"] == "suspected counterfeiter"].index)
 
 
