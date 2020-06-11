@@ -11,3 +11,4 @@ class Advert(db.Model):
     updated_by = db.Column(db.Text)
     updated_date = db.Column(db.Text)
     seller = db.Column(db.Text)
+    polonius_caseid=db.Column(db.Integer)

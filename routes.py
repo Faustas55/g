@@ -16,7 +16,7 @@ user = "app"
 upload_user = "upload"
 
 
-def get_catlist_user(category):
+def get_catlist_user(category,user):
     # This module selects the categories that are relevant for the state of the application
     # Usually this is the default but can pass in other states such as only suspected
     # What is being sent to polonius ('polo)
@@ -24,7 +24,7 @@ def get_catlist_user(category):
 
     switcher = {
         "Suspected": "suspected counterfeiter",
-        "Takedown": "takedown",
+        "Takedown": [["takedown"],user],
         "s": "suspected counterfeiter",
         "t": "takedown",
         "polo": [["suspected counterfeiter", "takedown"], user],
@@ -33,7 +33,7 @@ def get_catlist_user(category):
     # If default or no category then just send the new adverts
     return switcher.get(
         category,
-        [["uncategorised", "suspected counterfeiter", "takedown"], upload_user],
+        [["suspected counterfeiter","takedown","uncategorised"], upload_user]
     )
 
 
@@ -83,7 +83,7 @@ def home():
 @app.route("/getadverts/<country>/<category>", methods=["GET", "POST"])
 def getadverts(country, category="Default"):
 
-    categories, by_user = get_catlist_user(category)
+    categories, by_user = get_catlist_user(category,user)
     # categories=categories_user[0]
     # user=categories_user[1]
 
@@ -111,14 +111,15 @@ def getadverts(country, category="Default"):
     # Get all the adverts by country and category and order by seller
     adverts = (
         Advert.query.filter(
+            
             Advert.country == country,
             Advert.category.in_(categories),
-            Advert.updated_by == by_user,
+            Advert.updated_by == by_user
         )
         .order_by(Advert.seller)
         .all()
     )
-    print(len(adverts))
+    
     return render_template(
         "adverts.html",
         adverts=adverts,
