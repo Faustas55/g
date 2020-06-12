@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from .models import Advert
 
 
-
+#TODO  select only countries in home page with adverts that need categorising 
 
 
 
@@ -68,12 +68,12 @@ def home():
         return redirect(url_for("getadverts", country=request.form.get("country")))
 
     # get a list of countries from the database
-    # countries=[]
+    
     countries = [
         country[0]
         for country in Advert.query.with_entities(Advert.country).distinct().all()
     ]
-    # countries.append(country)
+   
 
     return render_template("home.html", countries=countries)
 
