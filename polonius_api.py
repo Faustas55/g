@@ -100,7 +100,7 @@ def get_casePayload(row):
         + str(row["category"])
         + " \n\n date found : "
         + str(row["date_found"])
-        + " \n Product Title: "
+        + " \n\n Product Title: "
         + str(row["product"])
         + " \n\n Seller Name: "
         + str(row["seller"])
