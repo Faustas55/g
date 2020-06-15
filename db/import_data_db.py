@@ -72,7 +72,7 @@ engine = create_engine("sqlite:///db/hades.db", echo=True)
 import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
 # debugging and test purposes
-import_file = "C:\\temp\\online.csv"
+#import_file = "C:\\temp\\online.csv"
 
 # importing a file with countries and regions that will be joined with the main database - F
 df_region = pd.read_csv(
