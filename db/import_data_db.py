@@ -22,9 +22,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.types import Integer, Text
 from pathlib import Path
 
-
 #set up database path 
-db_path=Path.cwd().joinpath('db', 'hades.db')
+path=Path.cwd()
+db_path=path.joinpath('db', 'hades.db')
+dbbak_path=path.joinpath('db', 'hades_backup.db')
 
 #set up logging
 def set_logging(name,level):
@@ -40,11 +41,12 @@ def set_logging(name,level):
 logger=set_logging('IMPORT DATA','INFO')
 
 
+
 #opening a connection to the database. Update with a correct path directory
 MainCon=sqlite3.connect(db_path)
 
 #opening a connection to the backup file
-BackupCon=sqlite3.connect(Path.cwd.joinpath('db', 'hades_backup.db'))
+BackupCon=sqlite3.connect(dbbak_path)
 
 #backup
 
@@ -62,7 +64,7 @@ BackupCon.close()
 
 
 
-engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
+engine = create_engine("sqlite:///db/hades.db", echo=True)
 
    
 
@@ -70,7 +72,7 @@ engine = create_engine("sqlite:///HadesV2App/db/hades.db", echo=True)
 import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
 # debugging and test purposes
-#import_file = "C:\\temp\\online.csv"
+import_file = "C:\\temp\\online.csv"
 
 # importing a file with countries and regions that will be joined with the main database - F
 df_region = pd.read_csv(
@@ -151,6 +153,9 @@ df = pd.read_csv(import_file)
 df_categories = df_db[["seller", "domain","category"]]
 df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
 
+#make sure the country is capitilised so there is only one country in the results
+df["country"]=df["country"].str.capitalize()
+
 # merging df with country and region database, renaming the column back into "region" - F
 df = pd.merge(df, df_region, on="country", how="left")
 df = df.rename(columns={"region_y": "region"})
@@ -178,7 +183,7 @@ if not df.empty:
     df = df.rename(columns=rename_cols)
 
     df= pd.merge(df, df_categories, on=['seller','domain'], how="left")
-    df['category']=df['category_y']
+    df['category']=df['category_x']
     df.drop(['category_y','category_x'],axis=1,inplace=True)
 
   
@@ -203,6 +208,9 @@ if not df.empty:
 
     # set category to lowercase
     df["category"] = df["category"].str.lower()
+
+    #make sure the country is capitilised so there is only one country in the results
+    df["country"]=df["country"].str.capitalize()
 
     # get rid of non -relevant sellers adverts
 
