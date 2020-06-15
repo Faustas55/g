@@ -178,7 +178,7 @@ if not df.empty:
     df = df.rename(columns=rename_cols)
 
     df= pd.merge(df, df_categories, on=['seller','domain'], how="left")
-    df['category']=df['category_y']
+    df['category']=df['category_x']
     df.drop(['category_y','category_x'],axis=1,inplace=True)
 
   
