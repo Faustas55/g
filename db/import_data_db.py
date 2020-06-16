@@ -186,7 +186,8 @@ if not df.empty:
     df['category']=df['category_x']
     df.drop(['category_y','category_x'],axis=1,inplace=True)
 
-  
+    #get rid of duplicates 
+    df.drop_duplicates(subset=['seller','domain','product'],inplace=True)
     
 
     logger.info('number of new cases to upload %s',df.shape[0])
@@ -220,12 +221,17 @@ if not df.empty:
    
     df.to_csv(export_file, index=False, columns=export_cols)
     # write the adverts back to the table "advert" as one big hit
-    df.to_sql(
-        "advert",
-        con=engine,
-        if_exists="append",
-        index=False,
-        dtype={"business": Text(), "product_brand": Text()},
-    )
+    
+    try:
+        df.to_sql(
+            "advert",
+            con=engine,
+            if_exists="append",
+            index=False,
+            dtype={"business": Text(), "product_brand": Text()},
+        )
+
+    except:
+        logger.error("error uploading adverts to hades.db.. please check ")
 else:
     logger.info("No new adverts found ")
