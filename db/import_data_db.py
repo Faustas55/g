@@ -150,7 +150,7 @@ df = pd.read_csv(import_file)
 
 
 #get a list of sellers with their past categories
-df_categories = df_db[["seller", "domain","category"]]
+df_categories = df_db[["seller", "domain","category"]].copy()
 df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
 
 #make sure the country is capitilised so there is only one country in the results =< Changed to str.title() to fix capitalization issues
