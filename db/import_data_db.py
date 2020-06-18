@@ -153,8 +153,8 @@ df = pd.read_csv(import_file)
 df_categories = df_db[["seller", "domain","category"]]
 df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
 
-#make sure the country is capitilised so there is only one country in the results
-df["country"]=df["country"].str.capitalize()
+#make sure the country is capitilised so there is only one country in the results =< Changed to str.title() to fix capitalization issues
+df["country"]=df["country"].str.title()
 
 # merging df with country and region database, renaming the column back into "region" - F
 df = pd.merge(df, df_region, on="country", how="left")
