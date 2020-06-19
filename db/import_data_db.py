@@ -58,6 +58,11 @@ except:
     logger.error('database has not been backed up')
     sys.exit()
 
+ #export to splunk   
+db_csv=pd.read_sql_query("SELECT * FROM advert", MainCon)
+db_csv.to_csv(r"C:\Splunk\intel\hadesresults\hadesresults.csv")
+
+
 #closing connections 
 MainCon.close()
 BackupCon.close()
