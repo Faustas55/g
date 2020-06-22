@@ -41,30 +41,37 @@ def set_logging(name,level):
 logger=set_logging('IMPORT DATA','INFO')
 
 
-
-#opening a connection to the database. Update with a correct path directory
-MainCon=sqlite3.connect(db_path)
-
-#opening a connection to the backup file
-BackupCon=sqlite3.connect(dbbak_path)
-
-#backup
-
 try:
-    with BackupCon:
-        MainCon.backup(BackupCon, pages=0)
+    #opening a connection to the database. Update with a correct path directory
+    MainCon=sqlite3.connect(db_path)
+    #opening a connection to the backup file
+    BackupCon=sqlite3.connect(dbbak_path)
 
-except:
-    logger.error('database has not been backed up')
+except sqlite3.OperationalError as error:
+    print('error -see log')
+    logger.error(f'database has not been backed up: {error}')
     sys.exit()
+
+
+
+
+    #backup
+
+
+with BackupCon:
+    MainCon.backup(BackupCon, pages=0)
+
+
 
 #closing connections 
 MainCon.close()
 BackupCon.close()
 
 
-
-engine = create_engine("sqlite:///db/hades.db", echo=True)
+try:
+    engine = create_engine("sqlite:///db/hades.db", echo=True)
+except sqlite3.OperationalError as error:
+    logger.error(f'can not create engine:{error} ')
 
    
 
@@ -231,7 +238,9 @@ if not df.empty:
             dtype={"business": Text(), "product_brand": Text()},
         )
 
-    except:
-        logger.error("error uploading adverts to hades.db.. please check ")
+    except sqlite3.Error as error:
+        logger.error(f"error uploading adverts to SQLlite :{error}")
+        print('error please check log')
 else:
     logger.info("No new adverts found ")
+    print('no new adverts')
