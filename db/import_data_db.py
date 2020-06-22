@@ -216,7 +216,7 @@ if not df.empty:
     df["category"] = df["category"].str.lower()
 
     #make sure the country is capitilised so there is only one country in the results
-    df["country"]=df["country"].str.capitalize()
+    df["country"]=df["country"].str.title()
 
     # get rid of non -relevant sellers adverts
 
