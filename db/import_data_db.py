@@ -63,6 +63,11 @@ with BackupCon:
 
 
 
+ #export to splunk   
+db_csv=pd.read_sql_query("SELECT * FROM advert", MainCon)
+db_csv.to_csv(r"C:\Splunk\intel\hadesresults\hadesresults.csv")
+
+
 #closing connections 
 MainCon.close()
 BackupCon.close()
@@ -157,11 +162,11 @@ df = pd.read_csv(import_file)
 
 
 #get a list of sellers with their past categories
-df_categories = df_db[["seller", "domain","category"]]
+df_categories = df_db[["seller", "domain","category"]].copy()
 df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
 
-#make sure the country is capitilised so there is only one country in the results
-df["country"]=df["country"].str.capitalize()
+#make sure the country is capitilised so there is only one country in the results =< Changed to str.title() to fix capitalization issues
+df["country"]=df["country"].str.title()
 
 # merging df with country and region database, renaming the column back into "region" - F
 df = pd.merge(df, df_region, on="country", how="left")
@@ -218,7 +223,7 @@ if not df.empty:
     df["category"] = df["category"].str.lower()
 
     #make sure the country is capitilised so there is only one country in the results
-    df["country"]=df["country"].str.capitalize()
+    df["country"]=df["country"].str.title()
 
     # get rid of non -relevant sellers adverts
 
