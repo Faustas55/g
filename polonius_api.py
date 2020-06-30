@@ -23,21 +23,20 @@ import logging
 import argparse
 
 
-
 # create the connection to the database
 engine = create_engine("sqlite:///db/hades.db", echo=False)
 
 # define globals development
-#caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct"
-#infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProductInf"
-#tokenurl="https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
-#secret="TbKs0R3e@A6V!p6c^Wq6CdPc"
+caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductCounterfeit"
+infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductInf"
+tokenurl = "https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
+secret = "TbKs0R3e@A6V!p6c^Wq6CdPc"
 
 # define globals production
-infringUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProductInf"
-tokenurl="https://syngenta.poloniouslive.com/syngenta/pcmsrest/oauth/token?"
-caseUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProduct"
-secret="D2s8tFJh79cxrQnUmyjNrZ69"
+# infringUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProductInf"
+# tokenurl="https://syngenta.poloniouslive.com/syngenta/pcmsrest/oauth/token?"
+# caseUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProduct"
+# secret="D2s8tFJh79cxrQnUmyjNrZ69"
 
 # get any optional arguments e.g polonius_api.py -c 20
 parser = argparse.ArgumentParser(
@@ -63,18 +62,16 @@ def set_logging(name, level):
     logger.addHandler(filelog)
     return logger
 
+
 # get the authorisation token
-def get_token(url,secret):
+def get_token(url, secret):
     # Creates header for OAuth request
-    
+
     payload = {
         "client_secret": secret,
         "client_id": "publicRestCall",
         "grant_type": "client_credentials",
     }
-
-
-
 
     # request a token for access
     try:
@@ -89,28 +86,50 @@ def get_token(url,secret):
     return {"Authorization": "Bearer " + token, "Content-Type": "text/plain"}
 
 
+# get product_details .. i.e standard prices and categories for any sub category e.g professional solutions is a sub cat of crop protection
+# send in the business
+def get_product_details(business):
+
+    switcher = {
+        "Crop Protection": ["Crop Protection", "Crop", "35", "2"],
+        "Seeds": ["Seeds", "Seed", "35", "2"],
+        "Professional Solutions": [
+            "Crop Protection",
+            "Professional solutions",
+            "150",
+            "1",
+        ],
+    }
+
+    # send False if no business unit found
+    return switcher.get(business, False)
+
+
 # payload is the case data to send to polonius
-def get_casePayload(row):
+def get_casePayload(row, category, price, quantity, businessUnit):
+
     return {
         "region": row["region"],
         "country": row["country"],
-        "businessUnit": row["business"],
-        "OffenceType": "Online Counterfeit",
-        "incidentDescription": "HADES UPLOAD: "
-        + str(row["category"])
-        + " \n\n date found : "
-        + str(row["date_found"])
-        + " \n\n Product Title: "
-        + str(row["product"])
-        + " \n\n Seller Name: "
-        + str(row["seller"])
-        + " \n\n url: "
-        + str(row["url"]),
+        "businessUnit": businessUnit,
+        "offenceType": "Online Counterfeit",
+        "justification": row["comments"],
+        "Notes": "HADES UPLOAD: " + str(row["category"]),
+        "sellerName": row["seller"],
+        "sellerNotes": "seller found from Hades on " + str(row["date_found"]),
+        "productName": row["product"],
+        "category": category,
+        "listingURL": row["url"],
+        "dateFound": row["date_found"],
+        "quantity": quantity,
+        "price": price,
+        "SecProfFirstname": row["SP_firstname"],
+        "SecProfLastname": row["SP_lastname"],
     }
 
 
-def get_cases(category,Notthisuser):
-    categories=",".join(category)
+def get_cases(category, Notthisuser):
+    categories = ",".join(category)
     sql = f"SELECT * FROM advert where category in ({categories}) and polonius_caseid is null and updated_by !={Notthisuser} "
 
     return pd.read_sql(sql, engine)
@@ -133,15 +152,15 @@ def send_data(headers, Url, casePayload):
         return r.json()
 
 
-
 ################Start of main program ##########
 # set the log
 logger = set_logging("API", "INFO")
 
 
-
 # get the suspected & takedown cases from hades which have no polonius case number
-df_db=get_cases(category=['"suspected counterfeiter"','"takedown"'],Notthisuser='"upload"')
+df_db = get_cases(
+    category=['"suspected counterfeiter"', '"takedown"'], Notthisuser='"upload"'
+)
 
 count_suspected = len(df_db[df_db["category"] == "suspected counterfeiter"].index)
 
@@ -165,13 +184,18 @@ else:
 
     # get header for API
 
-    token = get_token(tokenurl,secret)
+    token = get_token(tokenurl, secret)
     if token:
 
         # send to polonius the cases
 
         for index, row in df_db.iterrows():
-            casePayload = get_casePayload(row)
+
+            category, price, quantity, businessUnit = get_product_details(
+                row["business"]
+            )
+
+            casePayload = get_casePayload(row, category, price, quantity, businessUnit)
 
             if row.category == "suspected counterfeiter":
                 caseId = send_data(Url=caseUrl, headers=token, casePayload=casePayload)
@@ -181,11 +205,7 @@ else:
                     Url=infringUrl, headers=token, casePayload=casePayload
                 )
 
-           
-
             if caseId:
-
-                
 
                 # update sql
                 try:
@@ -200,12 +220,10 @@ else:
                         result = con.execute(sql)
 
                     logger.info(
-                    "sent case advert_id %s via API and got casenumber : %s",
-                    str(row["advert_id"]),
-                    str(caseId["referenceNumber"])
-                        )
-
-
+                        "sent case advert_id %s via API and got casenumber : %s",
+                        str(row["advert_id"]),
+                        str(caseId["referenceNumber"]),
+                    )
 
                 except:
                     print(
@@ -216,9 +234,9 @@ else:
                         str(row["advert_id"]),
                     )
             else:
-                
+
                 print("problem with sending case to polonius ..see log")
-                
+
                 logger.error(
                     "Problem with the Polonius API for advert_id: %s",
                     str(row["advert_id"]),
