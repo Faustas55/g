@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from .models import Advert
 
 
-#TODO  select only countries in home page with adverts that need categorising 
+
 
 
 
