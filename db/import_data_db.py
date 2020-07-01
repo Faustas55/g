@@ -64,8 +64,8 @@ with BackupCon:
 
 
  #export to splunk   
-db_csv=pd.read_sql_query("SELECT * FROM advert", MainCon)
-db_csv.to_csv(r"C:\Splunk\intel\hadesresults\hadesresults.csv")
+#db_csv=pd.read_sql_query("SELECT * FROM advert", MainCon)
+#db_csv.to_csv(r"C:\Splunk\intel\hadesresults\hadesresults.csv")
 
 
 #closing connections 
@@ -84,7 +84,7 @@ except sqlite3.OperationalError as error:
 import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
 # debugging and test purposes
-#import_file = "C:\\temp\\online.csv"
+import_file = "C:\\temp\\online.csv"
 
 # importing a file with countries and regions that will be joined with the main database - F
 df_region = pd.read_csv(
@@ -112,6 +112,9 @@ export_cols = [
     "polonius_caseid",
     "updated_date",
     "updated_by",
+    "firstname",
+    "lastname",
+    "type"
 ]
 
 
@@ -155,10 +158,14 @@ columns_drop = [
 # getting the advert table and convert into a dataframe ...
 df_db = pd.read_sql("SELECT * FROM advert", engine)
 
+#lets get the CS manager table as a df 
+df_csm = pd.read_sql("SELECT SP_firstname,SP_lastname,country FROM CSM ",engine)
 
 # read in the csv from splunk
 df = pd.read_csv(import_file)
 # print(df.head())
+
+
 
 
 #get a list of sellers with their past categories
@@ -171,6 +178,11 @@ df["country"]=df["country"].str.title()
 # merging df with country and region database, renaming the column back into "region" - F
 df = pd.merge(df, df_region, on="country", how="left")
 df = df.rename(columns={"region_y": "region"})
+
+
+#right lets add in to the df any responsible country security managers
+df = pd.merge(df,df_csm,on="country", how="left")
+
 
 # drop some more useless columns before we merge again
 df.drop(["score", "set_category"], axis=1, inplace=True)
