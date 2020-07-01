@@ -8,11 +8,8 @@
 # Logging is turned on and is called hades.log
 
 
-# TODO get the relevant cases from the hades database into casepayload -DONE
-# TODO captilize everything before sending - ATIKESH version 2.1
-# TODO update database with relevant Polonius case number -DONE
-# TODO Add is system variable for number of case to upload -DONE
-# TODO Limit only suspected cases ,unlimited for takedowns -DONE
+# TODO change API to send country manager and seller and product as seperate entities - RICH
+# TODO seperate configuration into a different class to be proper and all that
 
 
 # Import libraries
@@ -87,7 +84,7 @@ def get_token(url, secret):
 
 
 # get product_details .. i.e standard prices and categories for any sub category e.g professional solutions is a sub cat of crop protection
-# send in the business
+# We have set the figures here
 def get_product_details(business):
 
     switcher = {
@@ -102,7 +99,7 @@ def get_product_details(business):
     }
 
     # send False if no business unit found
-    return switcher.get(business, False)
+    return switcher.get(business, [False, False, False, False])
 
 
 # payload is the case data to send to polonius
@@ -194,52 +191,64 @@ else:
             category, price, quantity, businessUnit = get_product_details(
                 row["business"]
             )
-
-            casePayload = get_casePayload(row, category, price, quantity, businessUnit)
-
-            if row.category == "suspected counterfeiter":
-                caseId = send_data(Url=caseUrl, headers=token, casePayload=casePayload)
-
-            elif row.category == "takedown":
-                caseId = send_data(
-                    Url=infringUrl, headers=token, casePayload=casePayload
+            if category:
+                casePayload = get_casePayload(
+                    row, category, price, quantity, businessUnit
                 )
 
-            if caseId:
-
-                # update sql
-                try:
-                    sql = (
-                        "update advert set polonius_caseid="
-                        + str(caseId["referenceNumber"])
-                        + " where advert_id="
-                        + str(row["advert_id"])
+                if row.category == "suspected counterfeiter":
+                    caseId = send_data(
+                        Url=caseUrl, headers=token, casePayload=casePayload
                     )
 
-                    with engine.connect() as con:
-                        result = con.execute(sql)
-
-                    logger.info(
-                        "sent case advert_id %s via API and got casenumber : %s",
-                        str(row["advert_id"]),
-                        str(caseId["referenceNumber"]),
+                elif row.category == "takedown":
+                    caseId = send_data(
+                        Url=infringUrl, headers=token, casePayload=casePayload
                     )
 
-                except:
-                    print(
-                        "could not connect to sqlite database to update polonius_caseId ,see log"
-                    )
+                if caseId:
+
+                    # update sql
+                    try:
+                        sql = (
+                            "update advert set polonius_caseid="
+                            + str(caseId["referenceNumber"])
+                            + " where advert_id="
+                            + str(row["advert_id"])
+                        )
+
+                        with engine.connect() as con:
+                            result = con.execute(sql)
+
+                        logger.info(
+                            "sent case advert_id %s via API and got casenumber : %s",
+                            str(row["advert_id"]),
+                            str(caseId["referenceNumber"]),
+                        )
+
+                    except:
+                        print(
+                            "could not connect to sqlite database to update polonius_caseId ,see log"
+                        )
+                        logger.error(
+                            "could not connect to sqlite database to update polonius_caseId with advert_id: %s",
+                            str(row["advert_id"]),
+                        )
+                else:
+
+                    print("problem with sending case to polonius ..see log")
+
                     logger.error(
-                        "could not connect to sqlite database to update polonius_caseId with advert_id: %s",
+                        "Problem with the Polonius API for advert_id: %s",
                         str(row["advert_id"]),
                     )
             else:
-
-                print("problem with sending case to polonius ..see log")
-
+                print("error gettin product details see log")
                 logger.error(
-                    "Problem with the Polonius API for advert_id: %s",
-                    str(row["advert_id"]),
+                    "Problem with getting product details for : %s and business %s",
+                    str(row["advert_id"], row["business"]),
                 )
+
     else:
         print("problem getting token to access API --see log for details")
+
