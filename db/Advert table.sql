@@ -34,3 +34,19 @@ CREATE UNIQUE INDEX unique_SelProdDomain ON advert (
     domain
 );
   
+
+Alter Table advert
+ADD COLUMN comments TEXT;
+
+Alter Table advert
+ADD COLUMN SP_firstname TEXT;
+
+Alter Table advert
+ADD COLUMN SP_lastname TEXT;
+
+Alter Table advert
+ADD COLUMN type TEXT default "Distributor";
+
+
+
+
