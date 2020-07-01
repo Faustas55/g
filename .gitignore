@@ -7,3 +7,4 @@ db/*.db
 hades.db
 hadesv2.log
 db/online_transformed.csv
+db/regioncountry.csv
