@@ -91,6 +91,7 @@ def getadverts(country, category="Default"):
         advert_id = request.form.get("advert_id")
         advert_category = request.form.get("category")
         advert_business = request.form.get("business")
+        advert_comments = request.form.get("comments")
 
         # if it is a false positive update for all adverts and get rid of them immediately
         # this is for all sellers for a domain only.
@@ -102,6 +103,7 @@ def getadverts(country, category="Default"):
             update_Advert = Advert.query.get(advert_id)
             update_Advert.category = advert_category
             update_Advert.business = advert_business
+            update_Advert.comments = advert_comments
             update_Advert.updated_by = user
             update_Advert.updated_date = datetime.datetime.now().strftime(
                 "%Y-%m-%d %H:%M:%S"
