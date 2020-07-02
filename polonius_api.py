@@ -103,15 +103,21 @@ def get_product_details(business):
 
 
 # payload is the case data to send to polonius
-def get_casePayload(row, category, price, quantity, businessUnit):
+def get_casePayload(row, businessUnit,category, price, quantity):
 
     return {
+        "referenceNumber":"",
         "region": row["region"],
         "country": row["country"],
         "businessUnit": businessUnit,
         "offenceType": "Online Counterfeit",
         "justification": row["comments"],
-        "Notes": "HADES UPLOAD: " + str(row["category"]),
+        "notes": "HADES UPLOAD: " 
+        + str(row["category"])
+        + " \n\n date found : "
+        + str(row["date_found"])
+        + " \n\n Product Title: "
+        + str(row["product"]),
         "sellerName": row["seller"],
         "sellerNotes": "seller found from Hades on " + str(row["date_found"]),
         "productName": row["product"],
@@ -188,12 +194,12 @@ else:
 
         for index, row in df_db.iterrows():
 
-            category, price, quantity, businessUnit = get_product_details(
+            businessUnit,category, price, quantity,  = get_product_details(
                 row["business"]
             )
             if category:
                 casePayload = get_casePayload(
-                    row, category, price, quantity, businessUnit
+                    row,businessUnit, category, price, quantity, 
                 )
 
                 if row.category == "suspected counterfeiter":
@@ -246,8 +252,8 @@ else:
                 print("error gettin product details see log")
                 logger.error(
                     "Problem with getting product details for : %s and business %s",
-                    str(row["advert_id"], row["business"]),
-                )
+                    str(row["advert_id"]),str(row["business"])
+                            )
 
     else:
         print("problem getting token to access API --see log for details")
