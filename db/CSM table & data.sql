@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.2.1 on Wed Jul 1 17:20:12 2020
+-- File generated with SQLiteStudio v3.2.1 on Thu Jul 2 13:59:53 2020
 --
 -- Text encoding used: UTF-8
 --
@@ -76,8 +76,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     5,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban ',
                     'Mexico'
                 );
 
@@ -89,8 +89,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     6,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban ',
                     'Peru'
                 );
 
@@ -102,8 +102,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     7,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban ',
                     'Venezuela'
                 );
 
@@ -115,8 +115,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     8,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban ',
                     'Guatemala'
                 );
 
@@ -128,8 +128,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     9,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban ',
                     'Ecuador'
                 );
 
@@ -141,8 +141,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     10,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban ',
                     'Colombia'
                 );
 
@@ -557,9 +557,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     42,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Coral',
+                    'Meza',
+                    'Panama'
                 );
 
 INSERT INTO CSM (
@@ -570,9 +570,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     43,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Coral',
+                    'Meza',
+                    'Cuba'
                 );
 
 INSERT INTO CSM (
@@ -583,9 +583,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     44,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Coral',
+                    'Meza',
+                    'Dominican Republic'
                 );
 
 INSERT INTO CSM (
@@ -596,9 +596,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     45,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Coral',
+                    'Meza',
+                    'Costa Rica'
                 );
 
 INSERT INTO CSM (
@@ -609,9 +609,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     46,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Coral',
+                    'Meza',
+                    'Honduras'
                 );
 
 INSERT INTO CSM (
@@ -622,9 +622,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     47,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Coral',
+                    'Meza',
+                    'El Salvador'
                 );
 
 INSERT INTO CSM (
@@ -635,9 +635,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     48,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Cora',
+                    'Meza',
+                    'Nicaragua'
                 );
 
 INSERT INTO CSM (
@@ -648,9 +648,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     49,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Cora',
+                    'Meza',
+                    'Belize'
                 );
 
 INSERT INTO CSM (
@@ -661,9 +661,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     50,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Nahit_Bartug',
+                    'Yenisehirlioglu',
+                    'Israel'
                 );
 
 INSERT INTO CSM (
@@ -674,9 +674,9 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     51,
-                    NULL,
-                    NULL,
-                    NULL
+                    'Nahit_Bartug',
+                    'Yenisehirlioglu',
+                    'Kuwait'
                 );
 
 
