@@ -132,6 +132,8 @@ rename_cols = {
     "category_y": "category",
     "last_seen_y": "last_seen",
     "url_y": "url",
+    "SP_firstname_y":"SP_firstname",
+    "SP_lastname_y":"SP_lastname"
 }
 
 # Lets drop all the useless columns from the merge and the splunk report
@@ -152,6 +154,8 @@ columns_drop = [
     "updated_date",
     "updated_by",
     "_merge",
+    "SP_lastname_x",
+    "SP_firstname_x"
 ]
 
 
@@ -164,6 +168,8 @@ df_csm = pd.read_sql("SELECT SP_firstname,SP_lastname,country FROM CSM ",engine)
 # read in the csv from splunk
 df = pd.read_csv(import_file)
 # print(df.head())
+
+#set the default for type ..if null then set as Distributor
 
 
 
@@ -179,6 +185,8 @@ df["country"]=df["country"].str.title()
 df = pd.merge(df, df_region, on="country", how="left")
 df = df.rename(columns={"region_y": "region"})
 
+# set category to lowercase
+df["category"] = df["category"].str.lower()
 
 #right lets add in to the df any responsible country security managers
 df = pd.merge(df,df_csm,on="country", how="left")
@@ -231,9 +239,7 @@ if not df.empty:
 
     
 
-    # set category to lowercase
-    df["category"] = df["category"].str.lower()
-
+    
     #make sure the country is capitilised so there is only one country in the results
     df["country"]=df["country"].str.title()
 
@@ -243,7 +249,7 @@ if not df.empty:
 
     # write out the csv to be uploaded ..this is now just a backup
    
-    df.to_csv(export_file, index=False, columns=export_cols)
+    #df.to_csv(export_file, index=False, columns=export_cols)
     # write the adverts back to the table "advert" as one big hit
     
     try:
