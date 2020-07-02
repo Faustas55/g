@@ -2,13 +2,7 @@
 # into hades db on sqlite
 
 
-# TODO Sqlite admin : run an Sqlite backup before import ..schedule on server or create a script ?
-
-# TODO add in a region if none - Faustas = Done
-
-# TODO check if seller and domain is a false positive if yes do not import and discard = Rich -DONE
-
-# TODO check if seller and domain is in the database if so then update previous category next sprint v2.1
+# TODO Add a default for Type to distributer if null -RICH 
 
 
 
@@ -185,8 +179,7 @@ df["country"]=df["country"].str.title()
 df = pd.merge(df, df_region, on="country", how="left")
 df = df.rename(columns={"region_y": "region"})
 
-# set category to lowercase
-df["category"] = df["category"].str.lower()
+
 
 #right lets add in to the df any responsible country security managers
 df = pd.merge(df,df_csm,on="country", how="left")
@@ -224,6 +217,8 @@ if not df.empty:
 
     logger.info('number of new cases to upload %s',df.shape[0])
     
+    # set category to lowercase
+    df["category"] = df["category"].str.lower()
   
 
     # this is for SQLite rowid which is a primary key, send in a null object and sqlite will sort this out
