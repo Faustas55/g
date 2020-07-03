@@ -104,6 +104,9 @@ def get_product_details(business):
 
 # payload is the case data to send to polonius
 def get_casePayload(row, businessUnit,category, price, quantity):
+    
+    #get rid of "null" comments in polonius  
+    comments=lambda comment: " " if comment==None else comment
 
     return {
         "referenceNumber":"",
@@ -111,7 +114,7 @@ def get_casePayload(row, businessUnit,category, price, quantity):
         "country": row["country"],
         "businessUnit": businessUnit,
         "offenceType": "Online Counterfeit",
-        "justification": row["comments"],
+        "justification": comments( row["comments"]),
         "notes": "HADES UPLOAD: " 
         + str(row["category"])
         + " \n\n date found : "
