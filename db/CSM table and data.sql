@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.2.1 on Thu Jul 2 13:59:53 2020
+-- File generated with SQLiteStudio v3.2.1 on Fri Jul 3 09:38:22 2020
 --
 -- Text encoding used: UTF-8
 --
@@ -63,8 +63,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     4,
-                    'Daniel',
-                    'Nascimento',
+                    'Rodrigo ',
+                    'Silva',
                     'Brazil'
                 );
 
@@ -77,7 +77,7 @@ INSERT INTO CSM (
                 VALUES (
                     5,
                     'Arbelaez',
-                    'Esteban ',
+                    'Esteban',
                     'Mexico'
                 );
 
@@ -90,7 +90,7 @@ INSERT INTO CSM (
                 VALUES (
                     6,
                     'Arbelaez',
-                    'Esteban ',
+                    'Esteban',
                     'Peru'
                 );
 
@@ -103,7 +103,7 @@ INSERT INTO CSM (
                 VALUES (
                     7,
                     'Arbelaez',
-                    'Esteban ',
+                    'Esteban',
                     'Venezuela'
                 );
 
@@ -116,7 +116,7 @@ INSERT INTO CSM (
                 VALUES (
                     8,
                     'Arbelaez',
-                    'Esteban ',
+                    'Esteban',
                     'Guatemala'
                 );
 
@@ -129,7 +129,7 @@ INSERT INTO CSM (
                 VALUES (
                     9,
                     'Arbelaez',
-                    'Esteban ',
+                    'Esteban',
                     'Ecuador'
                 );
 
@@ -142,7 +142,7 @@ INSERT INTO CSM (
                 VALUES (
                     10,
                     'Arbelaez',
-                    'Esteban ',
+                    'Esteban',
                     'Colombia'
                 );
 
@@ -557,8 +557,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     42,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'Panama'
                 );
 
@@ -570,8 +570,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     43,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'Cuba'
                 );
 
@@ -583,8 +583,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     44,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'Dominican Republic'
                 );
 
@@ -596,8 +596,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     45,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'Costa Rica'
                 );
 
@@ -609,8 +609,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     46,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'Honduras'
                 );
 
@@ -622,8 +622,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     47,
-                    'Coral',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'El Salvador'
                 );
 
@@ -635,8 +635,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     48,
-                    'Cora',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'Nicaragua'
                 );
 
@@ -648,8 +648,8 @@ INSERT INTO CSM (
                 )
                 VALUES (
                     49,
-                    'Cora',
-                    'Meza',
+                    'Arbelaez',
+                    'Esteban',
                     'Belize'
                 );
 
