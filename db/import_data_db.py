@@ -164,8 +164,7 @@ df = pd.read_csv(import_file)
 # print(df.head())
 
 #set the default for type ..if null then set as Distributor
-
-
+df['type']=df.apply(lambda x: 'distributor' if pd.isnull(x['type']) else x['type'],axis=1)
 
 
 #get a list of sellers with their past categories
