@@ -80,6 +80,10 @@ import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_ou
 # debugging and test purposes
 import_file = "C:\\temp\\online.csv"
 
+#import filter that categorizes adds by brands and business
+filter_brands=pd.read_csv( 
+    Path.cwd().joinpath('db', 'filter.csv')
+
 # importing a file with countries and regions that will be joined with the main database - F
 df_region = pd.read_csv(
     Path.cwd().joinpath('db', 'regioncountry.csv'), keep_default_na=False, na_values=["_"]
@@ -102,6 +106,8 @@ export_cols = [
     "cat",
     "domain",
     "url",
+    "business",
+    "product_brand",
     "date_found",
     "polonius_caseid",
     "updated_date",
@@ -116,7 +122,7 @@ export_cols = [
 # merging new columns are created
 rename_cols = {
     "Product_category_for_polonius": "product_brand",
-    "Business": "business",
+    "Business_y": "business",
     "report_date": "date_found",
     "cat_y": "cat",
     "region_y": "region",
@@ -127,7 +133,8 @@ rename_cols = {
     "last_seen_y": "last_seen",
     "url_y": "url",
     "SP_firstname_y":"SP_firstname",
-    "SP_lastname_y":"SP_lastname"
+    "SP_lastname_y":"SP_lastname",
+    "product_brand_y":"product_brand"
 }
 
 # Lets drop all the useless columns from the merge and the splunk report
@@ -142,14 +149,15 @@ columns_drop = [
     "cat_x",
     "url_x",
     "date_found",
-    "business",
-    "product_brand",
     "polonius_caseid",
     "updated_date",
     "updated_by",
     "_merge",
     "SP_lastname_x",
-    "SP_firstname_x"
+    "SP_firstname_x",
+    "Unnamed: 2",
+    "keywords",
+    "product_brand_x"
 ]
 
 
@@ -170,6 +178,23 @@ df['type']=df.apply(lambda x: 'distributor' if pd.isnull(x['type']) else x['type
 #get a list of sellers with their past categories
 df_categories = df_db[["seller", "domain","category"]].copy()
 df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
+    
+ #duplicating the product column which is then used to split the strings into keywords
+df['keywords'] = df['product']
+df['keywords'] = df['keywords'].str.lower().str.split()
+
+#comparing the filter with the keywords, if there's a hit it gets written into the 'product_brand' column as a list 
+df['product_brand'] = df['keywords'].apply(lambda x: [item for item in x if item in filter_brands['product_brand'].tolist()])
+# list transformed to string  
+df['product_brand'] = df['product_brand'].apply(lambda x: ','.join(map(str, x)))
+
+#replacing all empty values with NaN that then get filled with 'None'
+df = df.replace('', np.nan)
+df['product_brand'].fillna(value="None", inplace=True)
+
+#merging the filter with the brands to get business information
+df=pd.merge(df, filter_brands, on="product_brand", how="left")
+df['product_brand']=df['product_brand'].str.title()
 
 #make sure the country is capitilised so there is only one country in the results =< Changed to str.title() to fix capitalization issues
 df["country"]=df["country"].str.title()
