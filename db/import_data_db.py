@@ -155,7 +155,6 @@ columns_drop = [
     "_merge",
     "SP_lastname_x",
     "SP_firstname_x",
-    "Unnamed: 2",
     "keywords",
     "Business_x",
     "product_brand_x"
