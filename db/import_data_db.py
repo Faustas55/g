@@ -157,6 +157,7 @@ columns_drop = [
     "SP_firstname_x",
     "Unnamed: 2",
     "keywords",
+    "Business_x",
     "product_brand_x"
 ]
 
