@@ -188,6 +188,9 @@ df['product_brand'] = df['keywords'].apply(lambda x: [item for item in x if item
 # list transformed to string  
 df['product_brand'] = df['product_brand'].apply(lambda x: ','.join(map(str, x)))
 
+#deleting everything after a comma if there's another string. The database will be cleaner and leaving the option to have all keyword hits if we need     
+splunk['brands'] = splunk['brands'].str.split(',').str[0]
+
 #replacing all empty values with NaN that then get filled with 'None'
 df = df.replace('', np.nan)
 df['product_brand'].fillna(value="None", inplace=True)
