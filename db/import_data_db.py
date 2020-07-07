@@ -180,8 +180,7 @@ df_categories = df_db[["seller", "domain","category"]].copy()
 df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
     
  #duplicating the product column which is then used to split the strings into keywords
-df['keywords'] = df['product']
-df['keywords'] = df['keywords'].str.lower().str.split()
+df['keywords'] = df['product'].str.lower().str.split()
 
 #comparing the filter with the keywords, if there's a hit it gets written into the 'product_brand' column as a list 
 df['product_brand'] = df['keywords'].apply(lambda x: [item for item in x if item in filter_brands['product_brand'].tolist()])
