@@ -37,7 +37,7 @@ def get_catlist_user(category,user):
     )
 
 
-def set_false_positive(advert_id, user):
+def set_no_action_all(advert_id, user):
     # set all sellers of the advertid to false positive for the domain of the advert
     # user is for logging  who updated the advert .
 
@@ -51,7 +51,7 @@ def set_false_positive(advert_id, user):
     # This took me a long time to find this on the internet
     Advert.query.filter_by(seller=Seller, domain=Domain).update(
         {
-            Advert.category: "false positive",
+            Advert.category: "No action all",
             Advert.updated_by: user,
             Advert.updated_date: updated_date,
         }
@@ -93,10 +93,10 @@ def getadverts(country, category="Default"):
         advert_business = request.form.get("business")
         advert_comments = request.form.get("comments")
 
-        # if it is a false positive update for all adverts and get rid of them immediately
+        # if it is a no action all update for all adverts and get rid of them immediately
         # this is for all sellers for a domain only.
-        if advert_category == "false positive":
-            set_false_positive(advert_id, user)
+        if advert_category == "no action all":
+            set_no_action_all(advert_id, user)
 
         else:
 
