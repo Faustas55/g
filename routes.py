@@ -49,11 +49,12 @@ def set_no_action_all(advert_id, user):
 
     # NOTICE the .update feature always use it without .all() or .first()
     # This took me a long time to find this on the internet
-    Advert.query.filter_by(seller=Seller, domain=Domain).update(
+    Advert.query.filter_by(seller=Seller, domain=Domain,category='uncategorised').update(
         {
             Advert.category: "No action all",
             Advert.updated_by: user,
             Advert.updated_date: updated_date,
+            
         }
     )
     db.session.commit()
