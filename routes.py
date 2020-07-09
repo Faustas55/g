@@ -49,6 +49,7 @@ def set_no_action_all(advert_id, user):
 
     # NOTICE the .update feature always use it without .all() or .first()
     # This took me a long time to find this on the internet
+    # This only applies to adverts that are uncategorised 
     Advert.query.filter_by(seller=Seller, domain=Domain,category='uncategorised').update(
         {
             Advert.category: "No action all",
