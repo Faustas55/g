@@ -126,7 +126,6 @@ def get_casePayload(row, businessUnit,category, price, quantity):
         "productName": row["product"],
         "category": category,
         "listingURL": row["url"],
-        "dateFound": row["date_found"],
         "quantity": quantity,
         "price": price,
         "SecProfFirstname": row["SP_firstname"],
