@@ -58,8 +58,8 @@ with BackupCon:
 
 
  #export to splunk   
-#db_csv=pd.read_sql_query("SELECT * FROM advert", MainCon)
-#db_csv.to_csv(r"C:\Splunk\intel\hadesresults\hadesresults.csv")
+db_csv=pd.read_sql_query("SELECT * FROM advert", MainCon)
+db_csv.to_csv(r"C:\Splunk\intel\hadesresults\hadesresults.csv")
 
 
 #closing connections 
@@ -82,8 +82,8 @@ import_file = "C:\\temp\\online.csv"
 
 #import filter that categorizes adds by brands and business
 filter_brands=pd.read_csv( 
-    Path.cwd().joinpath('db', 'filter.csv'))
-
+    Path.cwd().joinpath('db', 'filter.csv')
+)
 # importing a file with countries and regions that will be joined with the main database - F
 df_region = pd.read_csv(
     Path.cwd().joinpath('db', 'regioncountry.csv'), keep_default_na=False, na_values=["_"]
@@ -103,7 +103,7 @@ export_cols = [
     "seller",
     "category",
     "last_seen",
-    "cat",
+    "type",
     "domain",
     "url",
     "business",
@@ -124,7 +124,7 @@ rename_cols = {
     "Product_category_for_polonius": "product_brand",
     "Business_y": "business",
     "report_date": "date_found",
-    "cat_y": "cat",
+    "type_y": "cat",
     "region_y": "region",
     "country_y": "country",
     "price_y": "price",
@@ -146,7 +146,7 @@ columns_drop = [
     "cur_x",
     "category_x",
     "last_seen_x",
-    "cat_x",
+    "type_x",
     "url_x",
     "date_found",
     "polonius_caseid",
@@ -188,7 +188,7 @@ df['product_brand'] = df['keywords'].apply(lambda x: [item for item in x if item
 df['product_brand'] = df['product_brand'].apply(lambda x: ','.join(map(str, x)))
 
 #deleting everything after a comma if there's another string. Only need 1 keyword for splunk dashboards,but leaving the option to have all keyword hits if we need     
-df['brands'] = df['brands'].str.split(',').str[0]
+df['product_brand'] = df['product_brand'].str.split(',').str[0]
 
 #replacing all empty values with NaN that then get filled with 'None'
 df = df.replace('', np.nan)
@@ -256,7 +256,7 @@ if not df.empty:
     # set that the "upload user " has updated
     df.loc[:, "updated_by"] = "upload"
     # and when uploaded
-    df.loc[:, "updated_date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    df.loc[:, "uploaded_date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     
 
