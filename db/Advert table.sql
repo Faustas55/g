@@ -47,6 +47,9 @@ ADD COLUMN SP_lastname TEXT;
 Alter Table advert
 ADD COLUMN type TEXT default "Distributor";
 
+Alter Table advert
+ADD COLUMN uploaded_date TEXT;
+
 
 
 
