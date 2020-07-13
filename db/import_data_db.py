@@ -82,7 +82,7 @@ import_file = "C:\\temp\\online.csv"
 
 #import filter that categorizes adds by brands and business
 filter_brands=pd.read_csv( 
-    Path.cwd().joinpath('db', 'filter.csv')
+    Path.cwd().joinpath('db', 'filter.csv'))
 
 # importing a file with countries and regions that will be joined with the main database - F
 df_region = pd.read_csv(
