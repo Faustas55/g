@@ -24,16 +24,16 @@ import argparse
 engine = create_engine("sqlite:///db/hades.db", echo=False)
 
 # define globals development
-caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductCounterfeit"
-infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductInf"
-tokenurl = "https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
-secret = "TbKs0R3e@A6V!p6c^Wq6CdPc"
+#caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductCounterfeit"
+#infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductInf"
+#tokenurl = "https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
+#secret = "TbKs0R3e@A6V!p6c^Wq6CdPc"
 
 # define globals production
-# infringUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProductInf"
-# tokenurl="https://syngenta.poloniouslive.com/syngenta/pcmsrest/oauth/token?"
-# caseUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesNoProduct"
-# secret="D2s8tFJh79cxrQnUmyjNrZ69"
+infringUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesProductInf"
+tokenurl="https://syngenta.poloniouslive.com/syngenta/pcmsrest/oauth/token?"
+caseUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesProductCounterfeit"
+secret="D2s8tFJh79cxrQnUmyjNrZ69"
 
 # get any optional arguments e.g polonius_api.py -c 20
 parser = argparse.ArgumentParser(
@@ -89,7 +89,7 @@ def get_product_details(business):
 
     switcher = {
         "Crop Protection": ["Crop Protection", "Crop", "35", "2"],
-        "Seeds": ["Seeds", "Seed", "35", "2"],
+        "Seeds": ["Seeds", "Seed", "20", "5"],
         "Professional Solutions": [
             "Crop Protection",
             "Professional solutions",
