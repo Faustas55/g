@@ -114,30 +114,7 @@ def getadverts(country, category="Default"):
             db.session.commit()
     # This is the domain filter, first checks if there are any filters applied and then checks either the filter on the top or hidden inputs in advert forms
     
-    if request.args.get("domainname") == None:
-        if request.form.get("hiddenDomain") == None:
-             adverts = (
-             Advert.query.filter(
-                Advert.country == country,
-                Advert.category.in_(categories),
-                Advert.updated_by == by_user
-            )
-            .order_by(Advert.seller)
-            .all()
-        )
-        elif request.form.get("hiddenDomain") != None:
-         adverts = (
-         Advert.query.filter(
-            Advert.domain == request.form.get("hiddenDomain"),
-            Advert.country == country,
-            Advert.category.in_(categories),
-            Advert.updated_by == by_user
-        )
-        .order_by(Advert.seller)
-        .all()
-        )    
-    elif request.args.get("domainname") == "Default":
-       
+    if request.args.get("domainname") == "Default" and request.form.get("hiddenDomain") == None:
         adverts = (
          Advert.query.filter(
             Advert.country == country,
@@ -146,8 +123,32 @@ def getadverts(country, category="Default"):
         )
         .order_by(Advert.seller)
         .all()
-    )
-    else:
+    )   
+    
+    elif request.form.get("hiddenDomain") == "Default":
+        adverts = (
+         Advert.query.filter(
+            Advert.country == country,
+            Advert.category.in_(categories),
+            Advert.updated_by == by_user
+        )
+        .order_by(Advert.seller)
+        .all()
+    )   
+
+    elif request.args.get("domainname") == None and request.form.get("hiddenDomain") != None:
+        adverts = (
+         Advert.query.filter(
+            Advert.domain == request.form.get("hiddenDomain"),
+            Advert.country == country,
+            Advert.category.in_(categories),
+            Advert.updated_by == by_user
+        )
+        .order_by(Advert.seller)
+        .all()
+    )   
+
+    elif request.args.get("domainname") != None and request.form.get("hiddenDomain") == None:
         adverts = (
          Advert.query.filter(
             Advert.domain == request.args.get("domainname"),
@@ -158,6 +159,16 @@ def getadverts(country, category="Default"):
         .order_by(Advert.seller)
         .all()
     )   
+    else:
+        adverts = (
+         Advert.query.filter(
+            Advert.country == country,
+            Advert.category.in_(categories),
+            Advert.updated_by == by_user
+        )
+        .order_by(Advert.seller)
+        .all()
+    )      
         
      #returns domains for each country
 
