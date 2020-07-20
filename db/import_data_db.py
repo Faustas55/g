@@ -175,7 +175,7 @@ df = pd.read_csv(import_file)
 df['type']=df.apply(lambda x: 'distributor' if pd.isnull(x['type']) else x['type'],axis=1)
 
 
-#get a list of sellers with their past categories
+#get a list of sellers with their past categories this will change with FUASTAS new code 
 df_categories = df_db[["seller", "domain","category"]].copy()
 df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
     
