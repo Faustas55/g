@@ -112,10 +112,34 @@ def getadverts(country, category="Default"):
             )
             db.session.add(update_Advert)
             db.session.commit()
-    # Get all the adverts by country and category and order by seller
-    adverts = (
-        Advert.query.filter(
-            
+    # This is the domain filter, first checks if there are any filters applied and then checks either the filter on the top or hidden inputs in advert forms
+    
+    if request.args.get("domainname") == None:
+        if request.form.get("hiddenDomain") == None:
+             adverts = (
+             Advert.query.filter(
+                Advert.country == country,
+                Advert.category.in_(categories),
+                Advert.updated_by == by_user
+            )
+            .order_by(Advert.seller)
+            .all()
+        )
+        elif request.form.get("hiddenDomain") != None:
+         adverts = (
+         Advert.query.filter(
+            Advert.domain == request.form.get("hiddenDomain"),
+            Advert.country == country,
+            Advert.category.in_(categories),
+            Advert.updated_by == by_user
+        )
+        .order_by(Advert.seller)
+        .all()
+        )    
+    elif request.args.get("domainname") == "Default":
+       
+        adverts = (
+         Advert.query.filter(
             Advert.country == country,
             Advert.category.in_(categories),
             Advert.updated_by == by_user
@@ -123,6 +147,24 @@ def getadverts(country, category="Default"):
         .order_by(Advert.seller)
         .all()
     )
+    else:
+        adverts = (
+         Advert.query.filter(
+            Advert.domain == request.args.get("domainname"),
+            Advert.country == country,
+            Advert.category.in_(categories),
+            Advert.updated_by == by_user
+        )
+        .order_by(Advert.seller)
+        .all()
+    )   
+        
+     #returns domains for each country
+
+    domains = [
+        domain[0]
+        for domain in Advert.query.with_entities(Advert.domain).filter(Advert.country == country).distinct().all()
+    ]   
     
     return render_template(
         "adverts.html",
