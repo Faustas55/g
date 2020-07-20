@@ -171,6 +171,7 @@ def getadverts(country, category="Default"):
         adverts=adverts,
         country=country,
         category=category,
+        domains=domains,
         count=len(adverts),
     )
 
