@@ -6,45 +6,12 @@ List adverts
 
 <h2>List of {{count}} adverts for {{country}}</h2>
 
-  <form id="formdomain", class="dropdown" action="/getadverts/{{country}}"  method="GET">
-    <p>Filter by Domain</p>
-    <select id="domainname" name="domainname">
-      <option value="Default">All</option>
-      {%for domain in domains%}
-      <option value="{{domain}}">{{domain}}</option>
-      {%endfor%}
-      
-    
-    </select>
-    
-    
-    <button class="btndomain" id="btndomain" type="submit" form="formdomain" value="Submit">Submit</button>
-    
-  </form> 
-  <script> 
-    if (sessionStorage.getItem("selectedOption")) {
-      document.getElementById("domainname").value = sessionStorage.getItem("selectedOption");
-    }
-    
-    document.getElementById("formdomain").addEventListener("submit", () => {
-      var selectedOption = document.getElementById("domainname").value;
-      sessionStorage.setItem("selectedOption", selectedOption);
-    });
-  </script>
-
-
 
   {% for advert in adverts%}
   <form  name='adverts_form{{advert.advert_id}}' class="listadverts" id="form{{advert.advert_id}}" action="/getadverts/{{country}}" onsubmit="return ValidateForm({{advert.advert_id}})" method="post">
     
     
         <input id="advert_id" name="advert_id" type="hidden" value={{advert.advert_id}}>
-        <input id="hiddenDomain" name="hiddenDomain" type="hidden" value="">
-
-        <script>
-          var hiddendomainvar=sessionStorage.getItem("selectedOption");
-          document.getElementById("hiddenDomain").value=hiddendomainvar;
-        </script>
 
         <div class=seller_details>
           <p>{{advert.domain}}</p>
