@@ -101,9 +101,8 @@ a:active {
     appearance: none;
     background: url(http://www.syngenta.com/favicon.ico) 96% / 15% no-repeat #a6e3e9;
   }
-  
+
 .listadverts{
-  background-color: #cbf1f5;
     border: 1px dotted #71c9ce;
     min-height: 250px;
     min-width: 1000px;
@@ -112,6 +111,7 @@ a:active {
     align-items: center;
     justify-content: space-around;
     border-radius: 15px;
+
 
 
 }
@@ -144,6 +144,18 @@ a:active {
     margin-top:150px;
   }
 
+  .seller_statistics{
+    min-width:30%;
+    display: flex;
+    justify-content: space-between;
+    align-items: normal;
+    position:relative;
+    top:-20px;
+    right:-3px;
+    flex-direction: row;
+  }
+
+
   .seller_details{
     min-width:80%;
     display: flex;
@@ -154,6 +166,7 @@ a:active {
     
     flex-direction: row;
   }
+
 
   table{
     color:navy;
