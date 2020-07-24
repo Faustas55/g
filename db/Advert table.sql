@@ -50,6 +50,14 @@ ADD COLUMN type TEXT default "Distributor";
 Alter Table advert
 ADD COLUMN uploaded_date TEXT;
 
+ALTER TABLE advert
+ADD COLUMN no_action INTEGER;
+
+ALTER TABLE advert
+ADD COLUMN suspected_counterfeiter INTEGER;
+
+ALTER TABLE advert
+ADD COLUMN takedown INTEGER;
 
 
 
