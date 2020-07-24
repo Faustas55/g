@@ -103,6 +103,7 @@ a:active {
   }
 
 .listadverts{
+    background-color: #cbf1f5;
     border: 1px dotted #71c9ce;
     min-height: 250px;
     min-width: 1000px;
