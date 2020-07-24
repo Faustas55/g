@@ -113,7 +113,7 @@ def getadverts(country, category="Default"):
             db.session.add(update_Advert)
             db.session.commit()
     # This is the domain filter, first checks if there are any filters applied and then checks either the filter on the top or hidden inputs in advert form
-        adverts = (
+    adverts = (
          Advert.query.filter(
             Advert.country == country,
             Advert.category.in_(categories),
@@ -121,13 +121,8 @@ def getadverts(country, category="Default"):
         )
         .order_by(Advert.seller)
         .all()
-    )      
+    )            
         
-
-    domains = [
-        domain[0]
-        for domain in Advert.query.with_entities(Advert.domain).filter(Advert.country == country).distinct().all()
-    ]   
     
     return render_template(
         "adverts.html",
