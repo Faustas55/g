@@ -85,7 +85,6 @@ a:active {
     justify-content: space-around;
     border-radius: 15px;
     
-    
   }
    
   
@@ -103,15 +102,10 @@ a:active {
   }
 
 .listadverts{
-    background-color: #cbf1f5;
-    border: 1px dotted #71c9ce;
+    
     min-height: 250px;
     min-width: 1000px;
-    display: flex;
-    
-    align-items: center;
-    justify-content: space-around;
-    border-radius: 15px;
+   
 
 
 
@@ -146,6 +140,7 @@ a:active {
   }
 
   .seller_statistics{
+    font-size: 10px;
     min-width:30%;
     display: flex;
     justify-content: space-between;
