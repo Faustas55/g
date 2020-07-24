@@ -159,7 +159,39 @@ columns_drop = [
     "Business_x",
     "product_brand_x"
 ]
-
+#dropping columns in df_categories immediately after merging
+columns_dfcategories = [
+    "suspected_counterfeiter",
+    "no_action", 
+    'uncategorised\nuncategorised', 
+    'uncategorised', 
+    'not relevant', 
+    'syngenta authorised',
+    'authorised',
+    'takedown_x',
+    'advert_id', 
+    'region', 
+    'country', 
+    'product', 
+    'price', 
+    'cur',
+    'category', 
+    'last_seen', 
+    'cat', 
+    'domain', 
+    'url', 
+    'date_found',
+    'business', 
+    'product_brand', 
+    'polonius_caseid', 
+    'updated_date',
+    'updated_by', 
+    'type', 
+    'SP_firstname', 
+    'SP_lastname', 
+    'comments',
+    'uploaded_date'
+]
 
 # getting the advert table and convert into a dataframe ...
 df_db = pd.read_sql("SELECT * FROM advert", engine)
@@ -175,9 +207,14 @@ df = pd.read_csv(import_file)
 df['type']=df.apply(lambda x: 'distributor' if pd.isnull(x['type']) else x['type'],axis=1)
 
 
-#get a list of sellers with their past categories this will change with FUASTAS new code 
+#grouping by sellers by their category and reseting the index so we are able to merge
+df_groupedby=df_db.groupby(['seller','category']).size().unstack(level=1, fill_value=0).reset_index()
 df_categories = df_db[["seller", "domain","category"]].copy()
-df_categories.drop_duplicates(subset=["seller", "domain"],keep='last',inplace=True)
+
+#merging, dropping, and renaming the columns so it's easier later on when we join this with the main df
+df_categories = pd.merge(df_db, df_groupedby, on="seller", how="right")
+df_categories.drop(columns_dfcategories, axis=1, inplace=True)
+df_categories.rename(columns={"no action":"no_action", "suspected counterfeiter":"suspected_counterfeiter", "takedown_y":"takedown"}, inplace=True) 
     
  #duplicating the product column which is then used to split the strings into keywords
 df['keywords'] = df['product'].str.lower().str.split()
@@ -232,10 +269,13 @@ if not df.empty:
 
     # rename the columns so it fits the table fields in sqlite
     df = df.rename(columns=rename_cols)
-
-    df= pd.merge(df, df_categories, on=['seller','domain'], how="left")
-    df['category']=df['category_x']
-    df.drop(['category_y','category_x'],axis=1,inplace=True)
+    # merging the seller statistics with the main df
+    df= pd.merge(df, df_categories, on=['seller'], how="left")
+    df.rename(columns={'no_action_y':'no_action', 'suspected_counterfeiter_y':'suspected_counterfeiter', 'takedown_y':'takedown'}, inplace=True) 
+    df.drop(columns=['no_action_x', 'takedown_x', 'suspected_counterfeiter_x', 'set_category'], axis=1, inplace=True)
+    df.drop_duplicates(subset=['seller','domain'],inplace=True)
+    # fillna so we get a numerical value instead of none
+    df[['no_action', 'suspected_counterfeiter','takedown']]=df[['no_action', 'suspected_counterfeiter','takedown']].fillna(value=0)
 
     #get rid of duplicates 
     df.drop_duplicates(subset=['seller','domain','product'],inplace=True)
