@@ -78,7 +78,7 @@ except sqlite3.OperationalError as error:
 import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
 # debugging and test purposes
-import_file = "C:\\temp\\online.csv"
+#import_file = "C:\\temp\\online.csv"
 
 #import filter that categorizes adds by brands and business
 filter_brands=pd.read_csv( 
