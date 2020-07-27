@@ -78,7 +78,7 @@ except sqlite3.OperationalError as error:
 import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
 # debugging and test purposes
-import_file = "C:\\temp\\online.csv"
+#import_file = "C:\\temp\\online.csv"
 
 #import filter that categorizes adds by brands and business
 filter_brands=pd.read_csv( 
@@ -271,9 +271,11 @@ if not df.empty:
     df = df.rename(columns=rename_cols)
     # merging the seller statistics with the main df
     df= pd.merge(df, df_categories, on=['seller'], how="left")
-    df.rename(columns={'no_action_y':'no_action', 'suspected_counterfeiter_y':'suspected_counterfeiter', 'takedown_y':'takedown'}, inplace=True) 
+    df.rename(columns={'no_action_y':'no_action', 'suspected_counterfeiter_y':'suspected_counterfeiter', 'takedown_y':'takedown'}, inplace=True)
+    #adds no action all and no action together
+    #df['no_action'] = df['no_action'] + df['no_action_all']
     df.drop(columns=['no_action_x', 'takedown_x', 'suspected_counterfeiter_x', 'set_category'], axis=1, inplace=True)
-    df.drop_duplicates(subset=['seller','domain'],inplace=True)
+    df.drop_duplicates(subset=['url','domain'],inplace=True)
     # fillna so we get a numerical value instead of none
     df[['no_action', 'suspected_counterfeiter','takedown']]=df[['no_action', 'suspected_counterfeiter','takedown']].fillna(value=0)
 
