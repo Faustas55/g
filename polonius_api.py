@@ -130,6 +130,7 @@ def get_casePayload(row, businessUnit,category, price, quantity):
         "price": price,
         "SecProfFirstname": row["SP_firstname"],
         "SecProfLastname": row["SP_lastname"],
+        "dateFound": row["date_found"]
     }
 
 
