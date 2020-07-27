@@ -275,7 +275,7 @@ if not df.empty:
     #adds no action all and no action together
     #df['no_action'] = df['no_action'] + df['no_action_all']
     df.drop(columns=['no_action_x', 'takedown_x', 'suspected_counterfeiter_x', 'set_category'], axis=1, inplace=True)
-    df.drop_duplicates(subset=['seller','domain'],inplace=True)
+    df.drop_duplicates(subset=['url','domain'],inplace=True)
     # fillna so we get a numerical value instead of none
     df[['no_action', 'suspected_counterfeiter','takedown']]=df[['no_action', 'suspected_counterfeiter','takedown']].fillna(value=0)
 
