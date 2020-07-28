@@ -4,8 +4,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import sqlite3 as sql
-from sqlalchemy import create_engine
-from sqlalchemy.types import Integer, Text
+
 
 
 #connecting to the database and selecting all ads
