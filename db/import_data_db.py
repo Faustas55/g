@@ -161,6 +161,7 @@ columns_dfcategories = [
     "no_action", 
     'uncategorised\nuncategorised', 
     'uncategorised', 
+    'archived',
     'not relevant', 
     'syngenta authorised',
     'authorised',
