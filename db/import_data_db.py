@@ -230,7 +230,7 @@ df['product_brand'].fillna(value="None", inplace=True)
 
 #merging the filter with the brands to get business information
 df=pd.merge(df, filter_brands, on="product_brand", how="left")
-df['product_brand']=df['product_brand'].str.title()
+df['product_brand']=df['product_brand'].str.lower()
 
 #make sure the country is capitilised so there is only one country in the results =< Changed to str.title() to fix capitalization issues
 df["country"]=df["country"].str.title()
