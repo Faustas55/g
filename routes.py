@@ -1,8 +1,10 @@
 from HadesV2App import app,db
 import datetime
+import pandas as pd
+import numpy as np
 
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 
 from .models import Advert
 
@@ -141,3 +143,16 @@ def about():
 @app.route("/help")
 def help():
     return render_template("help.html")
+
+#reading polonious data and sending to takedowns.html to show completed takedown cases
+@app.route("/takedowns", methods=("POST","GET"))
+def takedowns():
+    Polonious=pd.read_csv(r'Z:\Investigations\Polonious2.csv', keep_default_na=False, na_values=["_"], dtype=object)
+    Polonious=Polonious[['case_number','region','country','datecreated','case_type','offence_type', 'case_status', 'tasknotes','personofinterest1_firstname','asset_1_productlisted_productname']]
+    Polonious=Polonious.loc[Polonious['offence_type']=='Online Counterfeit'] 
+    Polonious=Polonious.loc[Polonious['case_type']=='Infringement'] 
+    Polonious=Polonious.loc[Polonious['case_status']=='Closed']
+    Polonious['datecreated']=pd.to_datetime(Polonious.datecreated, format='%y-%m-%d') 
+    Polonious['datecreated']=Polonious['datecreated'].dt.strftime('%Y-%m-%d')
+    Poloniouslist=list(Polonious.values)
+    return render_template("takedowns.html", tables=Poloniouslist)
