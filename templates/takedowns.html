@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}
+List Takedowns
+{% endblock %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <style type="text/css" class="init">
+	
+    </style>
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" class="init">
+	
+
+    $(document).ready(function() {
+      $('#example').DataTable();
+    });
+</script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Case Number</th>
+                <th>Region</th>
+                <th>Country</th>
+                <th>Date Created</th>
+                <th>Case Type</th>
+                <th>Offence Type</th>
+                <th>Case Status</th>
+                <th>Tasknotes</th>
+                <th>Seller</th>
+                <th>Product</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for value in tables %}
+            <tr>
+                <td>{{ value[0] }}</td>
+                <td>{{ value[1] }}</td>
+                <td>{{ value[2] }}</td>
+                <td>{{ value[3] }}</td>
+                <td>{{ value[4] }}</td>
+                <td>{{ value[5] }}</td>
+                <td>{{ value[6] }}</td>
+                <td>{{ value[7] }}</td>
+                <td>{{ value[8] }}</td>
+                <td>{{ value[9] }}</td>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</body>
+
+</html>
+
+{% endblock %}
