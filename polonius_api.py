@@ -7,9 +7,10 @@
 #
 # Logging is turned on and is called hades.log
 
+#03/09 updated so no takedowns are sent only counterfeit cases 
 
-# TODO change API to send country manager and seller and product as seperate entities - RICH
-# TODO seperate configuration into a different class to be proper and all that
+#TODO change script so it will send takedown cases based on the status set by michelle once she 
+# has finished with her updates 
 
 
 # Import libraries
@@ -23,7 +24,7 @@ import argparse
 # create the connection to the database
 engine = create_engine("sqlite:///db/hades.db", echo=False)
 
-# define globals development
+# define globals development -need to talk to fred to get a new secret if we need training again
 #caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductCounterfeit"
 #infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductInf"
 #tokenurl = "https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
@@ -165,7 +166,7 @@ logger = set_logging("API", "INFO")
 
 # get the suspected & takedown cases from hades which have no polonius case number
 df_db = get_cases(
-    category=["'suspected counterfeiter'", "'takedown'"], Notthisuser="'upload'"
+    category=["'suspected counterfeiter'"], Notthisuser="'upload'"
 )
 
 count_suspected = len(df_db[df_db["category"] == "suspected counterfeiter"].index)
@@ -180,7 +181,7 @@ else:
     if count_suspected > limit:
 
         # takedowns are unlimited onlz stop suspected counterfeiters of above the limit
-        df_db = df_db[df_db["category"] == "takedown"]
+        #df_db = df_db[df_db["category"] == "takedown"]
 
         logger.warning(
             "%s suspected cases to process with a limit of %s cases. Please confirm these number of suspected cases are correct",
@@ -210,10 +211,10 @@ else:
                         Url=caseUrl, headers=token, casePayload=casePayload
                     )
 
-                elif row.category == "takedown":
-                    caseId = send_data(
-                        Url=infringUrl, headers=token, casePayload=casePayload
-                    )
+                #elif row.category == "takedown":
+                 #   caseId = send_data(
+                #        Url=infringUrl, headers=token, casePayload=casePayload
+                #    )
 
                 if caseId:
 
