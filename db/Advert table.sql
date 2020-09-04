@@ -60,4 +60,8 @@ ALTER TABLE advert
 ADD COLUMN takedown INTEGER;
 
 
-
+ALTER TABLE advert
+ ADD COLUMN review TEXT; 
+ 
+ALTER TABLE advert
+ ADD COLUMN justification TEXT;    
