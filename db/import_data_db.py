@@ -268,10 +268,10 @@ if not df.empty:
     df = df.rename(columns=rename_cols)
     # merging the seller statistics with the main df
     df= pd.merge(df, df_categories, on=['seller'], how="left")
-    df.rename(columns={'no_action_y':'no_action', 'suspected_counterfeiter_y':'suspected_counterfeiter', 'takedown_y':'takedown'}, inplace=True)
+    df.rename(columns={'no_action_y':'no_action', "No action all":"no_action_all", 'suspected_counterfeiter_y':'suspected_counterfeiter', 'takedown_y':'takedown', 'review_y':"review", 'justification_y':"justification" }, inplace=True)
     #adds no action all and no action together
-    #df['no_action'] = df['no_action'] + df['no_action_all']
-    df.drop(columns=['no_action_x', 'takedown_x', 'suspected_counterfeiter_x', 'set_category'], axis=1, inplace=True)
+    df['no_action'] = df['no_action'] + df['No action all']
+    df.drop(columns=['no_action_x', 'takedown_x', 'suspected_counterfeiter_x', 'set_category', 'review_x', 'justification_x'], axis=1, inplace=True)
     df.drop_duplicates(subset=['url','domain'],inplace=True)
     # fillna so we get a numerical value instead of none
     df[['no_action', 'suspected_counterfeiter','takedown']]=df[['no_action', 'suspected_counterfeiter','takedown']].fillna(value=0)
