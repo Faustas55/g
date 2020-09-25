@@ -1,0 +1,148 @@
+body{
+    height:100%;
+    width:100%;
+    background-color: #d7dfad;
+    
+}
+
+
+.navbar a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.navbar-brand {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.navbar-item {
+    font-variant: small-caps;
+    margin-left: 30px;
+}
+
+
+
+a:link {
+    color: #0000ff;
+}
+a:visited {
+  color: black;
+}
+a:hover {
+  color: red;
+}
+a:active {
+  color: #ff0000;
+}
+
+.body-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    background:rgba(255, 241, 224, 0.85);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0px;
+    color: black;
+    
+  }
+  
+  h2 {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    color: navy;
+  
+  }
+  
+  
+  #example{
+    background:rgba(255, 241, 224, 0.85);
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    table-layout:fixed;
+    word-break:break-all;
+
+  }
+
+
+  
+  form {
+    background:rgba(255, 241, 224, 0.85);
+    border: 1px dotted #71c9ce;
+    height: 150px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 15px;
+    
+    
+  }
+   
+  
+  select {
+    color: navy;
+    width: 200px;
+    padding: 5px 5px 5px 5px;
+    font-size: 15px;
+    border: 1px solid #71c9ce;
+    height: 34px;
+  
+    -moz-appearance: none;
+    appearance: none;
+    background: url(http://www.syngenta.com/favicon.ico) 96% / 15% no-repeat #a6e3e9;
+  }
+
+  
+  button{
+    color: navy;
+    background: #e3fdfd;
+    border: 1px solid #71c9ce;
+    padding: 10px;
+    border-radius: 5px;
+  
+  }
+
+  footer{
+
+    margin-top:150px;
+  }
+
+  #myChart, #piechartcategory, #barchartcountry, #barchartproductbrand {
+    width: 320px;
+    height: 350px;
+  }
+  .label {
+    text-align: center;
+    width: 600px;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px;
+}
+.chart_container {
+    float: left;
+}
+  
+
+  table{
+    color:navy;
+    border-collapse: collapse;
+    width: 90%;
+    background-color: #cbf1f5;
+    font-size: 0.8em;
+  }
+
+td, th {
+  border: 1px solid navy;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color:#a6e3e9;
+}
