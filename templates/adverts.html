@@ -13,12 +13,16 @@ List adverts
     
         <input id="advert_id" name="advert_id" type="hidden" value={{advert.advert_id}}>
 
-        <div class=seller_details>
+        <div class=seller_details id=seller_details>
           <p>{{advert.domain}}</p>
-          <p>Seller: {{advert.seller}}</p>  
+          <a href="{{url_for('seller_information', type=advert.seller)}}"><p>Seller: {{advert.seller}}</p></a>
           <p>Price: {{advert.price}}</p>
           
         </div>
+
+        <input type="hidden" name="seller_name" id="seller_name" value="{{advert.seller}}"></input>
+        
+        
     
         <div class=seller_statistics>
           <p>Suspected:{{advert.suspected_counterfeiter}}</p>
@@ -26,15 +30,10 @@ List adverts
           <p>No Action: {{advert.no_action}}</p>
           <p>Detected on: {{advert.date_found}}</p>
         </div>
-    
-    
+
         <div class=url>
         <a href={{advert.url}} , target="_blank">{{advert.product}}</a>
         </div>
-        
-
-      
-      
 
         <select id="category" name="category">
           <option value="{{advert.category}}">{{advert.category}}</option>
@@ -60,10 +59,11 @@ List adverts
 
         <button id="btn{{advert.advert_id}}" type="submit" form="form{{advert.advert_id}}" value="Submit">Submit</button>
 
-  </form>
 
+  </form>
 
   {% endfor %}
 
 
+  
 {% endblock %}
