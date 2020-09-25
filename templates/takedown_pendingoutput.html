@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block title %}
+List Takedowns
+{% endblock %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <style type="text/css" class="init">
+        
+    </style>
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+        
+    <script type="text/javascript" class="init">
+        
+    
+    $(document).ready(function() {
+        $('#tableoutput').DataTable();
+        });
+    </script>
+</head>
+
+<body>
+
+    <button onclick="location.href='/takedown_CSMpending'" class="button_takedownssubmit">To Takedowns Pending with CSMs</button>
+    <button onclick="location.href='/takedown_review'" class="button_takedowns">To New Takedown Review</button>
+    
+</body>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<div class="pendingtakedownoutput">
+<body>
+    <table id="tableoutput" class="display"  style="width:95%">
+        <thead>
+            <tr>
+                <th>Advert ID</th>
+                <th>Sent to Takedown On</th>
+                <th>Region</th>
+                <th>Country</th>
+                <th>Product</th>
+                <th>Seller</th>
+                <th>Platform</th>
+                <th>URL</th>
+                <th>Case Status</th>
+                <th>Justification</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for value in tables %}
+            <tr>
+                <td>{{ value[0] }}</td>
+                <td>{{ value[16] }}</td>
+                <td>{{ value[1] }}</td>
+                <td>{{ value[2] }}</td>
+                <td>{{ value[3] }}</td>
+                <td>{{ value[6] }}</td>
+                <td>{{ value[10] }}</td>
+                <td>{{ value[11] }}</td>
+                <td>{{ value[26] }}</td>
+                <td>{{ value[27] }}</td>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</body>
+
+</div>
+
+
+<div id="exportbutton">
+<body>
+    <form method ="post" id="exportbutton">
+        <button onclick="alertFunction()" type="submit" value="Submit" >Export Takedowns</button>
+    </form>
+
+    <script>
+        function alertFunction() {
+          alert("Takedowns successfully exported !");
+        }
+        </script>
+  </body>
+
+</div>
+
+</html>
+
+{% endblock %}

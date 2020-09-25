@@ -1,0 +1,269 @@
+{% extends "layout.html" %}
+{% block title %}
+List adverts
+{% endblock %}
+{% block content %}
+
+<head>
+    <meta charset="utf-8" />
+    <title>Chart.js Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='normalize.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='sellerinfo.css')}}" />
+    <h1>Seller Information - {{selected_seller}}</h1>
+</head>
+
+<div id="alligned1">
+    <div class="chart_container">
+        <h4>Number of Ads Detected By Month</h4>
+        <!-- bar chart canvas element -->
+        <canvas id="myChart" width="800" height="450"></canvas>
+    </div>
+    <div class="chart_container">
+        <h4>Ad Categories</h4>
+        <canvas id="piechartcategory" width="800" height="450"></canvas>
+    </div>
+</div>
+
+
+<div id="alligned2">
+    <div class="chart_container">
+        <h4>Number of Ads Detected By Country</h4>
+        <canvas id="barchartcountry" width="800" height="475"></canvas>
+    </div>
+    <div class="chart_container">
+        <h4>Number of Ads Detected By Product/Brand</h4>
+        <canvas id="barchartproductbrand" width="800" height="450"></canvas>
+    </div>
+</div>
+
+<script>
+
+
+ var chartDataNrAds = {
+   labels : [{% for item in labels %}
+              "{{item}}",
+             {% endfor %}],
+   datasets : [{
+       label: "{{legend}}",
+       lineTension: 0.1,
+       backgroundColor: 'rgba(0, 99, 132, 0.6)',
+       borderColor: 'rgba(0, 99, 132, 1)',
+       borderCapStyle: 'butt',
+       borderDash: [],
+       borderDashOffset: 0.0,
+       borderJoinStyle: 'miter',
+       pointBorderColor: "rgba(75,192,192,1)",
+       pointBackgroundColor: "#fff",
+       pointBorderWidth: 1,
+       pointHoverRadius: 5,
+       pointHoverBackgroundColor: "rgba(75,192,192,1)",
+       pointHoverBorderColor: "rgba(220,220,220,1)",
+       pointHoverBorderWidth: 2,
+       pointRadius: 1,
+       pointHitRadius: 10,
+       data : [{% for item in values %}
+                 {{item}},
+               {% endfor %}],
+       spanGaps: false
+   }]
+ }
+  
+
+ var ctx = document.getElementById("myChart").getContext("2d");
+  
+ var myChart = new Chart(ctx, {
+   type: 'bar',
+   data: chartDataNrAds,
+   options: {
+        legend: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+
+new Chart(document.getElementById("piechartcategory"), {
+    type: 'pie',
+    data: {
+      labels:  [{% for item in labels1 %}
+              "{{item}}",
+             {% endfor %}],
+      datasets: [{
+        label: "Number of ads",
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+        data: [{% for item in values1 %}
+                 {{item}},
+               {% endfor %}],
+      }]
+    },
+});
+
+
+
+
+var chartDataCountry = {
+labels : [{% for item in labelscountry %}
+          "{{item}}",
+         {% endfor %}],
+datasets : [{
+   label: "{{legendcountry}}",
+   lineTension: 0.1,
+   backgroundColor: 'rgba(0, 99, 132, 0.6)',
+   borderColor: 'rgba(0, 99, 132, 1)',
+   borderCapStyle: 'butt',
+   borderDash: [],
+   borderDashOffset: 0.0,
+   borderJoinStyle: 'miter',
+   pointBorderColor: "rgba(75,192,192,1)",
+   pointBackgroundColor: "#fff",
+   pointBorderWidth: 1,
+   pointHoverRadius: 5,
+   pointHoverBackgroundColor: "rgba(75,192,192,1)",
+   pointHoverBorderColor: "rgba(220,220,220,1)",
+   pointHoverBorderWidth: 2,
+   pointRadius: 1,
+   pointHitRadius: 10,
+   data : [{% for item in valuescountry %}
+             {{item}},
+           {% endfor %}],
+   spanGaps: false
+}]
+}
+
+
+var ctxcountry = document.getElementById("barchartcountry").getContext("2d");
+
+
+var myChartcountry = new Chart(ctxcountry, {
+type: 'bar',
+data: chartDataCountry,
+options: {
+    legend: false,
+    scales: {
+        yAxes: [{
+            ticks: {
+                beginAtZero: true
+            }
+        }]
+    }
+}
+});
+
+
+
+
+
+var chartDataproductbrand = {
+labels : [{% for item in labelsproductbrand %}
+          "{{item}}",
+         {% endfor %}],
+datasets : [{
+   label: "{{legendproductbrand}}",
+   fill: true,
+   lineTension: 0.1,
+   backgroundColor: 'rgba(0, 99, 132, 0.6)',
+   borderColor: 'rgba(0, 99, 132, 1)',
+   borderCapStyle: 'butt',
+   borderDash: [],
+   borderDashOffset: 0.0,
+   borderJoinStyle: 'miter',
+   pointBorderColor: "rgba(75,192,192,1)",
+   pointBackgroundColor: "#fff",
+   pointBorderWidth: 1,
+   pointHoverRadius: 5,
+   pointHoverBackgroundColor: "rgba(75,192,192,1)",
+   pointHoverBorderColor: "rgba(220,220,220,1)",
+   pointHoverBorderWidth: 2,
+   pointRadius: 1,
+   pointHitRadius: 10,
+   data : [{% for item in valuesproductbrand %}
+             {{item}},
+           {% endfor %}],
+   spanGaps: false
+}]
+}
+
+
+var productbrand = document.getElementById("barchartproductbrand").getContext("2d");
+
+
+var myChartproductbrand = new Chart(productbrand, {
+type: 'bar',
+data: chartDataproductbrand,
+options: {
+    legend: false,
+    scales: {
+        yAxes: [{
+            ticks: {
+                beginAtZero: true
+            }
+        }]
+    }
+}
+});
+</script>
+
+  <head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <style type="text/css" class="init">
+	
+    </style>
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" class="init">
+	
+
+    $(document).ready(function() {
+      $('#example').DataTable();
+    });
+</script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <h1>Hades Entries - {{selected_seller}}</h1>
+</head>
+<div id="sellerinfotable">
+<body>
+    <table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Advert ID</th>
+                <th>Uploaded On Hades</th>
+                <th>Region</th>
+                <th>Country</th>
+                <th>Seller</th>
+                <th>Domain</th>
+                <th>URL</th>
+                <th>Ad Category</th>
+                <th>Business</th>
+                <th>Product/Brand</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for value in tables %}
+            <tr>
+                <td>{{ value[0] }}</td>
+                <td>{{ value[22] }}</td>
+                <td>{{ value[1] }}</td>
+                <td>{{ value[2] }}</td>
+                <td>{{ value[6] }}</td>
+                <td>{{ value[10] }}</td>
+                <td>{{ value[11] }}</td>
+                <td>{{ value[7] }}</td>
+                <td>{{ value[13] }}</td>
+                <td>{{ value[14] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</body>
+
+{% endblock %}
+
+</html>
