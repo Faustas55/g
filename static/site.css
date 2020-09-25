@@ -1,111 +1,117 @@
 body{
-    height:100%;
-    width:100%;
-    background-color: #e3fdfd;
-    
+  height:100%;
+  width:100%;
+  background-color: #e3fdfd;
+  
 }
 
 
 .navbar {
-  font-size: 0.8em;
-  background-color: #71c9ce;
-  padding: 10px;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  color: white;
+font-size: 0.8em;
+background-color: #71c9ce;
+padding: 10px;
+font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+color: white;
 }
 
 
 
 .navbar a {
-    text-decoration: none;
-    color: inherit;
+  text-decoration: none;
+  color: inherit;
 }
 
 .navbar-brand {
-    font-size: 1.2em;
-    font-weight: 600;
+  font-size: 1.2em;
+  font-weight: 600;
 }
 
 .navbar-item {
-    font-variant: small-caps;
-    margin-left: 30px;
+  font-variant: small-caps;
+  margin-left: 30px;
 }
 
 
 
 a:link {
-    color: #0000ff;
+  color: #0000ff;
 }
 a:visited {
-  color: black;
+color: black;
 }
 a:hover {
-  color: red;
+color: red;
 }
 a:active {
-  color: #ff0000;
+color: #ff0000;
 }
 
 .body-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    min-height: 100vh;
-    background: linear-gradient(rgba(203, 241, 245, 0.85), rgba(227, 253, 253, 0.8)),
-                  url('IMG_2011.JPG') 0% 0%/cover no-repeat;
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 0px;
-    color: navy;
-    
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(rgba(203, 241, 245, 0.85), rgba(227, 253, 253, 0.8)),
+                url('IMG_2011.JPG') 0% 0%/cover no-repeat;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0px;
+  color: navy;
   
-  h2 {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 40px;
-    color: navy;
-  
-  }
-  
-  
+}
+
+h2 {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+  color: navy;
+
+}
 
 
 
+
+
+
+form {
+  background-color: #cbf1f5;
+  border: 1px dotted #71c9ce;
+  height: 150px;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  border-radius: 15px;
   
-  form {
-    background-color: #cbf1f5;
-    border: 1px dotted #71c9ce;
-    height: 150px;
-    width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    border-radius: 15px;
-    
-  }
-   
   
-  select {
-    color: navy;
-    width: 200px;
-    padding: 5px 5px 5px 5px;
-    font-size: 15px;
-    border: 1px solid #71c9ce;
-    height: 34px;
-  
-    -moz-appearance: none;
-    appearance: none;
-    background: url(http://www.syngenta.com/favicon.ico) 96% / 15% no-repeat #a6e3e9;
-  }
+}
+ 
+
+select {
+  color: navy;
+  width: 200px;
+  padding: 5px 5px 5px 5px;
+  font-size: 15px;
+  border: 1px solid #71c9ce;
+  height: 34px;
+
+  -moz-appearance: none;
+  appearance: none;
+  background: url(http://www.syngenta.com/favicon.ico) 96% / 15% no-repeat #a6e3e9;
+}
 
 .listadverts{
-    
-    min-height: 250px;
-    min-width: 1000px;
-   
+  background-color: #cbf1f5;
+  border: 1px dotted #71c9ce;
+  min-height: 250px;
+  min-width: 1000px;
+  display: flex;
+  
+  align-items: center;
+  justify-content: space-around;
+  border-radius: 15px;
 
 
 
@@ -113,77 +119,139 @@ a:active {
 
 .help{
 
-  background-color: #cbf1f5;
-    border: 1px dotted #71c9ce;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    padding-right:10px;
-    font-size: 0.9em;
+background-color: #cbf1f5;
+  border: 1px dotted #71c9ce;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  padding-right:10px;
+  font-size: 0.9em;
 
 }
-  
-  button{
-    color: navy;
-    background: #e3fdfd;
-    border: 1px solid #71c9ce;
-    padding: 10px;
-    border-radius: 5px;
-  
-  }
 
-  footer{
+.takedowns{
+background-color: #cbf1f5;
+  border: 1px dotted #71c9ce;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  padding-right:10px;
+  font-size: 0.9em;
 
-    margin-top:150px;
-  }
+}
 
-  .seller_statistics{
-    font-size: 10px;
-    min-width:30%;
-    display: flex;
-    justify-content: space-between;
-    align-items: normal;
-    position:relative;
-    top:-20px;
-    right:-3px;
-    flex-direction: row;
-  }
+button{
+  color: navy;
+  background: #e3fdfd;
+  border: 1px solid #71c9ce;
+  padding: 10px;
+  border-radius: 5px;
+
+}
+
+footer{
+
+  margin-top:150px;
+}
 
 
-  .seller_details{
-    min-width:80%;
-    display: flex;
-    justify-content: space-between;
-    margin-right: 20px;
-    padding:0px;
-    align-items: space-between;
+.seller_statistics{
+  font-size: 10px;
+  min-width:30%;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: normal;
+  position:relative;
+  top:-20px;
+  right:-3px;
+  flex-direction: row;
+}
+
+#exportbutton{
+    position: relative;
+    top: 75px;
+    font-size: 16px;
+}
     
-    flex-direction: row;
-  }
-
-  .url{
-    position:relative;
-    top: -20px;
-
-  }
 
 
-  table{
-    color:navy;
-    border-collapse: collapse;
-    width: 90%;
-    background-color: #cbf1f5;
-    font-size: 0.8em;
-  }
+.button_takedowns{
+    position:absolute;
+    top: 50px;
+    left:10px;
+    font-size: 12px;
+  
+}
+
+.button_takedownssubmit{
+  position:absolute;
+  top: 100px;
+  left:10px; 
+  font-size: 12px;
+}
+
+#example{
+  width:100%;
+  table-layout:fixed;
+  word-break:break-all;
+}
+
+
+
+.seller_details{
+  min-width:80%;
+  display: flex;
+  justify-content: space-between;
+  margin-right: 20px;
+  padding:0px;
+  align-items: space-between;
+  flex-direction: row;
+}
+
+.url{
+  position:relative;
+  top: -20px;
+
+}
+
+#myChart, #piechartcategory, #barchartcountry, #barchartproductbrand {
+  width: 320px;
+  height: 350px;
+}
+.label {
+  text-align: center;
+  width: 600px;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 20px;
+}
+.chart_container {
+  float: left;
+}
+
+.pendingtakedownoutput{
+  position: relative;
+  top: 150px;
+}
+
+table{
+  color:navy;
+  border-collapse: collapse;
+  width: 90%;
+  background-color: #cbf1f5;
+  font-size: 0.8em;
+}
 
 td, th {
-  border: 1px solid navy;
-  text-align: left;
-  padding: 8px;
+border: 1px solid navy;
+text-align: left;
+padding: 8px;
 }
 
 tr:nth-child(even) {
-  background-color:#a6e3e9;
+background-color:#a6e3e9;
 }
