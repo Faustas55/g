@@ -9,8 +9,7 @@
 
 #03/09 updated so no takedowns are sent only counterfeit cases 
 
-#TODO change script so it will send takedown cases based on the status set by michelle once she 
-# has finished with her updates 
+
 
 
 # Import libraries
@@ -121,7 +120,9 @@ def get_casePayload(row, businessUnit,category, price, quantity):
         + " \n\n date found : "
         + str(row["date_found"])
         + " \n\n Product Title: "
-        + str(row["product"]),
+        + str(row["product"])
+        + " \n\n Notes: "
+        + str(row["comments"]),
         "sellerName": row["seller"],
         "sellerNotes": "seller found from Hades on " + str(row["date_found"]),
         "productName": row["product"],
