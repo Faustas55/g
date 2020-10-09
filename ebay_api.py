@@ -24,6 +24,10 @@ def set_logging(name, level):
 
 logger = set_logging("EBAY IMPORT", "INFO")
 
+#set up globals 
+upload_user='upload'
+category='uncategorised'
+
 
 # API key
 appkey = "PeterJon-POC-PRD-9e46bc082-552fc78e"
@@ -223,6 +227,8 @@ while total >= page:
         item_dict["url"] = item["viewItemURL"][0]
         item_dict["comments"] = "seller location:" + item["location"][0]
         item_dict['cat']=item['primaryCategory'][0]['categoryName'][0]
+        item_dict['updated_by']=upload_user
+        item_dict['category']=category
 
         data_list.append(item_dict)
 

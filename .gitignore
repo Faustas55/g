@@ -10,3 +10,4 @@ db/online_transformed.csv
 db/regioncountry.csv
 config.py
 hadesAWS.log
+hades.log
