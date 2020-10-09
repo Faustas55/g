@@ -168,7 +168,7 @@ elif globalId == "EBAY-SG":
     keywords = "(syngenta,advion,demand duo)"
 
 else:
-    raise Exception("Ebay ID not configured for splunkcolumns")
+    raise Exception("Ebay ID not configured for database")
 
 
 # Creates variables for pagination
@@ -222,7 +222,7 @@ while total >= page:
         item_dict["date_found"] = run_time
         item_dict["url"] = item["viewItemURL"][0]
         item_dict["comments"] = "seller location:" + item["location"][0]
-        item_dict['cat']=item['primaryCategory'][0]['categoryName']
+        item_dict['cat']=item['primaryCategory'][0]['categoryName'][0]
 
         data_list.append(item_dict)
 
@@ -238,10 +238,12 @@ while total >= page:
 # Creates dataframe
 df = pd.DataFrame(data_list)
 
-#get rid of same seller and product 
-df.drop_duplicates(inplace=True)
+#get rid of any duplicates based on seller and product name and domain if looking at more than one site
+df.drop_duplicates(inplace=True,subset=['seller','product','domain'])
 
-#remove adverts with keywords
+#remove adverts with keywords ???
+
+
 
 #sends to the database 
 
