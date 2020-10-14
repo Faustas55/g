@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 def set_logging(name, level):
     logger = logging.getLogger(name)
     logger.setLevel(level)
-    filelog = logging.FileHandler("hades.log")
+    filelog = logging.FileHandler("hadesv2.log")
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%m/%d/%Y %I:%M:%S %p",
