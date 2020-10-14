@@ -6,11 +6,25 @@
 
 
 
+from typing import ContextManager
 import mysql.connector
 import scrapy
 import config
+import datetime
+import contextlib
 
 from scrapy.crawler import CrawlerProcess
+from scrapy.spidermiddlewares.httperror import HttpError
+
+
+###STOP SQL INJECTION ######
+#escape the vlaues of the query for update#
+uncategorised='uncategorised'
+noaction='no action'
+uploaddate=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+user='upload'
+
+
 
 class AdvertSpider(scrapy.Spider):
 
@@ -18,23 +32,42 @@ class AdvertSpider(scrapy.Spider):
 
     def start_requests(self):
         
-
+        'urls is defined outside of class'
         for dict in urls:
             advert_id=dict['advert_id']
             url=dict['url']
-            yield scrapy.Request(url=url,callback=self.parse,meta={'advert_id':id})
+            yield scrapy.Request(url=url,callback=self.parse,errback=self.errback,meta={'advert_id':advert_id})
 
 
     def parse(self, response):
         
         msg=response.css('span.msgTextAlign::text').get()
         msg_dict[response.meta['advert_id']]=msg
-              
+
+
+    def errback(self, failure):
+
+        if failure.check(HttpError):
+            
+            msg_dict[failure.request.meta['advert_id']]='NotFound'
 
 
 
 
-def get_outofstock_adverts():
+@contextlib.contextmanager
+def get_db_connection():
+
+    """
+    function to get a mysql database connection 
+
+    Args:
+        none
+
+    Returns:
+        mysql database connection  
+
+
+    """
 
     mydb=mysql.connector.connect(
     host=config.host,
@@ -44,29 +77,70 @@ def get_outofstock_adverts():
 
     )
 
-    mycursor=mydb.cursor(dictionary=True)
+    yield mydb
 
-    mycursor.execute("select url,advert_id from advert where category='Outofstock/Paused'")
+
+    mydb.close()
+
+
+
+
+
+def update_db(sql):
+    """
+    function to update mysql database
+
+    Args:
+        sql(str): sql to update the database
+
+    Returns:
+        rows (int): number of rows affected by sql statement  
+
+
+    """
+    with get_db_connection() as mydb:
+        mycursor=mydb.cursor()
+        mycursor.execute(sql)
+        mydb.commit()
+        rows= mycursor.rowcount
+        mycursor.close()
+        return rows
+
+
+
+def get_outofstock_adverts(sql):
+    """
+    function to slect all out of stock adverts
+
+    Args:
+        sql(str): sql to select from  the database
+
+    Returns:
+        dictionary: items retrieved from the select statement 
+
+
+    """
+    with get_db_connection() as mydb:
+
+        mycursor=mydb.cursor(dictionary=True)
+
+        mycursor.execute(sql)
  
-    return mycursor.fetchall()
+        return mycursor.fetchall()
     
 
 
 
 
-#set up the dictionary outside of class so can pass back the message :-) (strings or lists do not wor for some reason)
-
+#set up the dictionary outside of class so can pass back the message :-) (strings or lists do not work for some reason)
 msg_dict=dict()
+
+#get database connection
+#mydb=get_db_connection()
 
 
 #obtain list of urls from hades (where category=out of stock)
-urls=get_outofstock_adverts()
-
-
-
-
-#urls=['https://www.ebay.com/itm/Advion-Roach-Cockroach-Killer-Bait-Gel-4-Tubes-Free-Tips-Plunger/154078345940?hash=item23dfc8fad4:g:1-kAAOSwKWJfVuZt']
-
+urls=get_outofstock_adverts(f'select url,advert_id from advert where category="Outofstock/Paused"')
 
 
 #run the spider
@@ -75,11 +149,16 @@ process.crawl(AdvertSpider)
 process.start()
 
 
-#check to see if there is no message if so then update status to uncategorised and put in comments that is was out of stock 
+#check to see if there is no message if so then update status to uncategorised else if not found put to no action and put in comments that is was out of stock 
 
 for key,value in msg_dict.items():
+    #out of stock message has gone 
     if value=='' or value ==None:
-        #update the database for that adver_id 
-        pass
+        comments=f'\\n This advert was being monitored (out of stock) category changed to {uncategorised}'
+        rows=update_db(f"update advert set category='{uncategorised}',updated_by='{user}',updated_date='{uploaddate}',comments=CONCAT_WS('',comments,'{comments}') where advert_id='{key}'")
 
+    #404 type situation    
+    if value=='NotFound':
+        comments=f'\\n This advert was being monitored (out of stock) category changed to {noaction}'
+        rows=update_db(f"update advert set category='{noaction}',updated_by='{user}',updated_date='{uploaddate}',comments=CONCAT_WS('',comments,'{comments}') where advert_id='{key}'")
 
