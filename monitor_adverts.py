@@ -23,12 +23,16 @@ uncategorised='uncategorised'
 noaction='no action'
 uploaddate=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 user='upload'
+outofstockcat='Outofstock/Paused'
 
-
-
+## class customised for finding the out of stock -ebay and pasued adverts mercadolibra
 class AdvertSpider(scrapy.Spider):
 
     name='adverts'
+
+    custom_settings = {
+        'USER_AGENT': 'Mozilla/5.0 ',
+    }
 
     def start_requests(self):
         
@@ -36,14 +40,27 @@ class AdvertSpider(scrapy.Spider):
         for dict in urls:
             advert_id=dict['advert_id']
             url=dict['url']
-            yield scrapy.Request(url=url,callback=self.parse,errback=self.errback,meta={'advert_id':advert_id})
+            
+            yield scrapy.Request(url=url,callback=self.parse,errback=self.errback,meta={'advert_id':advert_id},dont_filter=True)
+
+            
+
+                
+           
 
 
     def parse(self, response):
-        
+        #ebay first 
         msg=response.css('span.msgTextAlign::text').get()
+        #mercadolibre second try 
+        if msg==None:
+            msg=response.css('p.item-status-notification__title::text').get()
+        
         msg_dict[response.meta['advert_id']]=msg
 
+    
+       
+       
 
     def errback(self, failure):
 
@@ -135,12 +152,9 @@ def get_outofstock_adverts(sql):
 #set up the dictionary outside of class so can pass back the message :-) (strings or lists do not work for some reason)
 msg_dict=dict()
 
-#get database connection
-#mydb=get_db_connection()
-
 
 #obtain list of urls from hades (where category=out of stock)
-urls=get_outofstock_adverts(f'select url,advert_id from advert where category="Outofstock/Paused"')
+urls=get_outofstock_adverts(f"select url,advert_id from advert where category='{outofstockcat}'")
 
 
 #run the spider
