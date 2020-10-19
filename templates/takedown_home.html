@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}
+Home
+{% endblock %}
+{% block content %}
+
+
+<h2>Takedowns</h2>
+
+<body>
+
+    <button onclick="location.href='/takedown_CSMpending'" class="button_takedownssubmit">To Takedowns Pending with CSMs</button>
+    <button onclick="location.href='/takedown_pendingoutput'" class="button_takedowns">To Takedown Export</button>
+    
+</body>
+
+<div id="dropdownmenu">
+
+
+    <form id="formCountry" ,action="home" method="POST">
+        <p>Please select a country</p>
+        <select id="country" name="country">
+        {% for i in combined %}
+            {% for country,takedowns in i.items() %}
+
+            <option value="{{country}}">{{country}} (Pending:{{takedowns}})</option>
+            {%endfor%}
+        {%endfor%}
+        </select>
+
+        <button class="btncountry" id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>
+
+    </form>
+
+
+</div>
+
+
+
+{% endblock %}
