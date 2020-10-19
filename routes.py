@@ -213,6 +213,28 @@ def about():
 def help():
     return render_template("help.html")
 
+@app.route("/takedown_home", methods=["GET", "POST"])
+def takedown_home(category="takedown", review="Sent to Review"):
+
+    # Intercepts the post back to redirect to takedown_review.html and the selected country
+    # unpacks the dictionary that gets sent back from the dropdown menu
+    if request.method == "POST":
+        for key, val in request.form.items("country"):
+         return redirect(url_for("takedown_review", country=val))
+
+    #Sending a dictionary to the page: {'Country':Number of Pending Takedowns}
+    
+    engine = create_engine("sqlite:///db/hades.db", echo=False)
+    conn=engine.connect()
+    sql="""SELECT COUNT(*), country FROM advert WHERE review="Sent to Review" AND category='takedown' GROUP BY country"""
+    df=pd.read_sql_query(sql, conn)
+
+    combined=[{df['country'][i]: df['COUNT(*)'][i] for i in range(len(df['country']))}]
+
+
+    return render_template("takedown_home.html", combined=combined )
+
+
 @app.route("/takedowns", methods=("POST","GET"))
 def takedowns():
 
