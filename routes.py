@@ -7,6 +7,7 @@ import re
 
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, create_engine
 from flask import Flask, render_template, request, redirect, session, url_for
 
 from .models import Advert
@@ -245,9 +246,9 @@ def takedowns():
 
     return render_template("takedowns.html", tables=df)
 
-
-@app.route("/takedown_review", methods=("POST","GET"))
-def takedown_review(category="takedown"):
+@app.route("/takedown_review")
+@app.route("/takedown_review/<country>", methods=["GET","POST"])
+def takedown_review(country, category="takedown", review="Sent to Review"):
 
     # works just like the script to show ads for categorising, but this is for takedowns
     if request.method == "POST":
@@ -264,10 +265,11 @@ def takedown_review(category="takedown"):
 
     adverts = (
          Advert.query.filter(
+            Advert.country == country,
             Advert.category == category,
-            Advert.review == "Sent to Review"
+            Advert.review == review
         )
-        .order_by(Advert.seller)
+        .order_by(Advert.seller.desc(), Advert.updated_date.desc())
         .all()
     )            
         
@@ -276,7 +278,8 @@ def takedown_review(category="takedown"):
         "takedown_review.html",
         adverts=adverts,
         category=category,
-        count=len(adverts),
+        country=country,
+        count=len(adverts)
     )
 
 @app.route("/takedown_CSMpending", methods=("POST","GET"))
