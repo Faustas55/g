@@ -8,14 +8,14 @@ List adverts
 
 <html>
 <body>
-
-<button onclick="location.href='/takedown_home'" class="button_takedowns">To Main Page</button>
+ <button onclick="location.href='/takedown_home'" class="button_takedowns">To Main Page</button>
 <button onclick="location.href='/takedown_CSMpending'"  class="button_takedownssubmit">To Takedowns Pending with CSMs</button>
-  
+
+
 </body>
 </html>
   {% for advert in adverts%}
-  <form  name='adverts_form{{advert.advert_id}}' class="listadverts" id="form{{advert.advert_id}}" action="/takedown_review" onsubmit="return ValidateForm({{advert.advert_id}})" method="post">
+  <form  name='adverts_form{{advert.advert_id}}' class="listadverts" id="form{{advert.advert_id}}" action="/takedown_review/{{country}}" onsubmit="return ValidateForm({{advert.advert_id}})" method="post">
     
     
         <input id="advert_id" name="advert_id" type="hidden" value={{advert.advert_id}}>
