@@ -249,7 +249,8 @@ def takedowns():
     now = datetime.now()
     fortyfivedays = now - timedelta(days=45)
     # connect to the DB and transforms it to a list so the data can be presented using DataTables. Last 45days only
-    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.updated_date > fortyfivedays).statement, con=db.session.bind)
+    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.updated_date > fortyfivedays).statement, 
+                   con=db.session.bind)
 
     df=list(df.values)
 
@@ -329,7 +330,8 @@ def takedown_CSMpending(category="takedown", review="Waiting for CSM Clarificati
 @app.route("/takedown_pendingoutput", methods=("POST","GET"))
 def takedown_pendingoutput():
     # showing table with takedowns that are ready to be exported and transforming the data to a list 
-    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.review =="Takedown Reviewed and Ready to be Sent to CSC").statement, con=db.session.bind)
+    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.review =="Takedown Reviewed and Ready to be Sent to CSC").statement, 
+                   con=db.session.bind)
 
     dflist=list(df.values)
 
