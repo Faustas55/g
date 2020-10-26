@@ -18,6 +18,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import logging
 import argparse
+import sys
 
 
 # create the connection to the database
@@ -181,7 +182,7 @@ else:
 
     if count_suspected > limit:
 
-        # takedowns are unlimited onlz stop suspected counterfeiters of above the limit
+        # 
         #df_db = df_db[df_db["category"] == "takedown"]
 
         logger.warning(
@@ -189,6 +190,8 @@ else:
             str(count_suspected),
             str(limit),
         )
+
+        sys.exit("Number of suspected cases above limit ..please check")
 
     # get header for API
 
