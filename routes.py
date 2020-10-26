@@ -2,13 +2,17 @@ from HadesV2App import app,db
 import datetime
 import pandas as pd
 import numpy as np
-import sqlite3
 import re
+import pymysql
+pymysql.install_as_MySQLdb()
+import MySQLdb
 
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, create_engine
 from flask import Flask, render_template, request, redirect, session, url_for
+from sqlalchemy import create_engine, func
+from datetime import datetime, timedelta
+
 
 from .models import Advert
 
@@ -47,7 +51,7 @@ def set_no_action_all(advert_id, user):
     # set all sellers of the advertid to false positive for the domain of the advert
     # user is for logging  who updated the advert .
 
-    updated_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    updated_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     an_advert = Advert.query.get(advert_id)
     Seller = an_advert.seller
@@ -75,12 +79,14 @@ def home():
 
         return redirect(url_for("getadverts", country=request.form.get("country")))
 
-    # get a list of countries from the database
+    # get a list of countries from the database and sort alphabetically 
     
     countries = [
         country[0]
         for country in Advert.query.with_entities(Advert.country).distinct().all()
     ]
+
+    countries=sorted(countries)
    
 
     return render_template("home.html", countries=countries)
@@ -115,7 +121,7 @@ def getadverts(country, category="Default"):
             update_Advert.comments = advert_comments
             update_Advert.review = "Sent to Review"
             update_Advert.updated_by = user
-            update_Advert.updated_date = datetime.datetime.now().strftime(
+            update_Advert.updated_date = datetime.now().strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
             db.session.add(update_Advert)
@@ -129,7 +135,7 @@ def getadverts(country, category="Default"):
             update_Advert.business = advert_business
             update_Advert.comments = advert_comments
             update_Advert.updated_by = user
-            update_Advert.updated_date = datetime.datetime.now().strftime(
+            update_Advert.updated_date = datetime.now().strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
             db.session.add(update_Advert)
@@ -160,11 +166,10 @@ def getadverts(country, category="Default"):
 def seller_information():
     #get the seller name that was sent from adverts.html and connects to the DB
     selected_seller=request.args.get('type')
-    con=sqlite3.connect(r"C:\Hades\HadesV2App\db\hades.db")
-    sql="""SELECT * from advert WHERE seller=?"""
 
+    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.seller == selected_seller).statement, con=db.session.bind)
     #retrieves the table
-    df=pd.read_sql_query(sql, con, params=[selected_seller])
+
     df1=list(df.values)
 
     #convert time so we can group by uploaded date
@@ -214,6 +219,7 @@ def about():
 def help():
     return render_template("help.html")
 
+
 @app.route("/takedown_home", methods=["GET", "POST"])
 def takedown_home(category="takedown", review="Sent to Review"):
 
@@ -224,27 +230,32 @@ def takedown_home(category="takedown", review="Sent to Review"):
          return redirect(url_for("takedown_review", country=val))
 
     #Sending a dictionary to the page: {'Country':Number of Pending Takedowns}
+    df=pd.read_sql(
+    sql=db.session.query(Advert.country, func.count(Advert.review))
+    .filter(Advert.review == review, Advert.category == category)
+    .group_by(Advert.country)
+    .order_by(Advert.country.asc()).statement,
+    con=db.session.bind
+    )
     
-    engine = create_engine("sqlite:///db/hades.db", echo=False)
-    conn=engine.connect()
-    sql="""SELECT COUNT(*), country FROM advert WHERE review="Sent to Review" AND category='takedown' GROUP BY country"""
-    df=pd.read_sql_query(sql, conn)
-
-    combined=[{df['country'][i]: df['COUNT(*)'][i] for i in range(len(df['country']))}]
+    combined=[{df['country'][i]: df['count_1'][i] for i in range(len(df['country']))}]
 
 
     return render_template("takedown_home.html", combined=combined )
 
-
 @app.route("/takedowns", methods=("POST","GET"))
 def takedowns():
-
+    
+    now = datetime.now()
+    fortyfivedays = now - timedelta(days=45)
     # connect to the DB and transforms it to a list so the data can be presented using DataTables. Last 45days only
-    con=sqlite3.connect(r"C:\Hades\HadesV2App\db\hades.db")
-    df=pd.read_sql("""SELECT * from advert WHERE category='takedown'  AND updated_date >= date('now', '-45 day')""", con)
+    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.updated_date > fortyfivedays).statement, 
+                   con=db.session.bind)
+
     df=list(df.values)
 
     return render_template("takedowns.html", tables=df)
+
 
 @app.route("/takedown_review")
 @app.route("/takedown_review/<country>", methods=["GET","POST"])
@@ -283,7 +294,7 @@ def takedown_review(country, category="takedown", review="Sent to Review"):
     )
 
 @app.route("/takedown_CSMpending", methods=("POST","GET"))
-def takedown_CSMpending(category="takedown"):
+def takedown_CSMpending(category="takedown", review="Waiting for CSM Clarification"):
 
     # additional page to send ads that need more clarification from CSMs, the code is the same as takedowns/ad categorisation
     if request.method == "POST":
@@ -302,7 +313,7 @@ def takedown_CSMpending(category="takedown"):
     adverts = (
          Advert.query.filter(
             Advert.category == category,
-            Advert.review == "Waiting for CSM Clarification"
+            Advert.review == review
         )
         .order_by(Advert.seller)
         .all()
@@ -319,8 +330,9 @@ def takedown_CSMpending(category="takedown"):
 @app.route("/takedown_pendingoutput", methods=("POST","GET"))
 def takedown_pendingoutput():
     # showing table with takedowns that are ready to be exported and transforming the data to a list 
-    con=sqlite3.connect(r"C:\Hades\HadesV2App\db\hades.db")
-    df=pd.read_sql("""SELECT * from advert WHERE category='takedown' AND review="Takedown Reviewed and Ready to be Sent to CSC" """, con)
+    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.review =="Takedown Reviewed and Ready to be Sent to CSC").statement, 
+                   con=db.session.bind)
+
     dflist=list(df.values)
 
     
@@ -331,7 +343,7 @@ def takedown_pendingoutput():
         columns= ['advert_id', 'region', 'country', 'product', 'url', 'justification']
 
         # getting the date which will be written into the csv titles.
-        now = datetime.datetime.now()
+        now = datetime.now()
         date = now.strftime('%Y%b%d_%HH%MM')
 
         # starting a loop for each domain
@@ -345,8 +357,9 @@ def takedown_pendingoutput():
             data.to_csv(path+date+"_"+"{}.csv".format(domain), index=False, encoding='utf-8-sig', columns=columns)
 
         # changing the status of all exported ads, this is a lazy way to do it, but works when we export takedowns in batches
-        con.execute("""UPDATE advert SET review='Sent to CSC for Takedown' WHERE review='Takedown Reviewed and Ready to be Sent to CSC'""" )
-        con.commit()
+        
+        db.session.query(Advert).filter(Advert.review == 'Takedown Reviewed and Ready to be Sent to CSC').update({'review': 'Sent to CSC for Takedown'})
+        db.session.commit()
 
     return render_template(
             "takedown_pendingoutput.html", tables=dflist
