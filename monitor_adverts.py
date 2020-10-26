@@ -153,7 +153,7 @@ def get_outofstock_adverts(sql):
 msg_dict=dict()
 
 
-#obtain list of urls from hades (where category=out of stock)
+#obtain list of urls from hades (where category=out of stock\paused)
 urls=get_outofstock_adverts(f"select url,advert_id from advert where category='{outofstockcat}'")
 
 
