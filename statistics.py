@@ -1,15 +1,22 @@
-#a basic script to export ad statistics from hades.db to a csv files which then goes to Splunk.
+#a basic script to export ad statistics from hades.db to a csv file which then goes to Splunk.
 #set up as a scheduled task on the remote server
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+from sqlalchemy import create_engine
 import datetime
 import numpy as np
 import pandas as pd
-import sqlite3 as sql
+import config
+import pymysql
+pymysql.install_as_MySQLdb()
+import MySQLdb
 
 
 
-#connecting to the database and selecting all ads
-con=sql.connect(r"C:\Hades\HadesV2App\db\hades.db")
-df_db = pd.read_sql("SELECT * FROM advert", con)
+
+# selecting all ads
+db_connect= create_engine('mysql://'+ config.username +":" + config.password +"@localhost/"+ config.database)
+df_db = pd.read_sql_table('advert', con=db_connect)
 
 #exporting the database to splunk so we don't need to run the import script to get the data
 df_db.to_csv(r"C:\Splunk\intel\hadesresults\hadesresults.csv")
