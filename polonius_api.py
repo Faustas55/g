@@ -7,34 +7,23 @@
 #
 # Logging is turned on and is called hades.log
 
-#03/09 updated so no takedowns are sent only counterfeit cases 
+# 03/09 updated so no takedowns are sent only counterfeit cases
 
 
-
-
-# Import libraries
-import requests
-from sqlalchemy import create_engine
-import pandas as pd
-import logging
 import argparse
+import logging
 import sys
 
+import pandas as pd
+import requests
 
-# create the connection to the database
-engine = create_engine("sqlite:///db/hades.db", echo=False)
+import config
+import mysql_utils
 
-# define globals development -need to talk to fred to get a new secret if we need training again
-#caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductCounterfeit"
-#infringUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesUATProductInf"
-#tokenurl = "https://syngenta.poloniouslive.com/syngentatraining/pcmsrest/oauth/token?"
-#secret = "TbKs0R3e@A6V!p6c^Wq6CdPc"
+engine = mysql_utils.get_alchemy_engine()
 
-# define globals production
-infringUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesProductInf"
-tokenurl="https://syngenta.poloniouslive.com/syngenta/pcmsrest/oauth/token?"
-caseUrl ="https://syngenta.poloniouslive.com/syngenta/public/oauth/task/v1/mapping/HadesProductCounterfeit"
-secret="D2s8tFJh79cxrQnUmyjNrZ69"
+
+caseId = None
 
 # get any optional arguments e.g polonius_api.py -c 20
 parser = argparse.ArgumentParser(
@@ -104,19 +93,19 @@ def get_product_details(business):
 
 
 # payload is the case data to send to polonius
-def get_casePayload(row, businessUnit,category, price, quantity):
-    
-    #get rid of "null" comments in polonius  
-    comments=lambda comment: " " if comment==None else comment
+def get_casePayload(row, businessUnit, category, price, quantity):
+
+    # get rid of "null" comments in polonius
+    comments = lambda comment: " " if comment == None else comment
 
     return {
-        "referenceNumber":"",
+        "referenceNumber": "",
         "region": row["region"],
         "country": row["country"],
         "businessUnit": businessUnit,
         "offenceType": "Online Counterfeit",
-        "justification": comments( row["comments"]),
-        "notes": "HADES UPLOAD: " 
+        "justification": comments(row["comments"]),
+        "notes": "HADES UPLOAD: "
         + str(row["category"])
         + " \n\n date found : "
         + str(row["date_found"])
@@ -133,15 +122,17 @@ def get_casePayload(row, businessUnit,category, price, quantity):
         "price": price,
         "SecProfFirstname": row["SP_firstname"],
         "SecProfLastname": row["SP_lastname"],
-        "dateFound": row["date_found"]
+        "dateFound": row["date_found"],
     }
 
 
 def get_cases(category, Notthisuser):
     categories = ",".join(category)
-    sql = f"SELECT * FROM advert where category in ({categories}) and polonius_caseid is null and updated_by !={Notthisuser} "
+    sql = f"SELECT * FROM hades.advert where category in ({categories}) and polonius_caseid is null and updated_by !={Notthisuser} "
 
-    return pd.read_sql(sql, engine)
+    with engine.connect() as connection:
+
+        return pd.read_sql(sql, connection)
 
 
 # send all ze data to polonius
@@ -167,9 +158,10 @@ logger = set_logging("API", "INFO")
 
 
 # get the suspected & takedown cases from hades which have no polonius case number
-df_db = get_cases(
-    category=["'suspected counterfeiter'"], Notthisuser="'upload'"
-)
+
+
+df_db = get_cases(category=["'suspected counterfeiter'"], Notthisuser="'upload'")
+
 
 count_suspected = len(df_db[df_db["category"] == "suspected counterfeiter"].index)
 
@@ -182,8 +174,8 @@ else:
 
     if count_suspected > limit:
 
-        # 
-        #df_db = df_db[df_db["category"] == "takedown"]
+        #
+        # df_db = df_db[df_db["category"] == "takedown"]
 
         logger.warning(
             "%s suspected cases to process with a limit of %s cases. Please confirm these number of suspected cases are correct",
@@ -195,59 +187,59 @@ else:
 
     # get header for API
 
-    token = get_token(tokenurl, secret)
+    token = get_token(config.tokenurl, config.secret)
     if token:
 
         # send to polonius the cases
 
         for index, row in df_db.iterrows():
 
-            businessUnit,category, price, quantity,  = get_product_details(
+            businessUnit, category, price, quantity, = get_product_details(
                 row["business"]
             )
             if category:
                 casePayload = get_casePayload(
-                    row,businessUnit, category, price, quantity, 
+                    row, businessUnit, category, price, quantity,
                 )
 
                 if row.category == "suspected counterfeiter":
                     caseId = send_data(
-                        Url=caseUrl, headers=token, casePayload=casePayload
+                        Url=config.caseUrl, headers=token, casePayload=casePayload
                     )
 
-                #elif row.category == "takedown":
-                 #   caseId = send_data(
+                # elif row.category == "takedown":
+                #   caseId = send_data(
                 #        Url=infringUrl, headers=token, casePayload=casePayload
                 #    )
 
                 if caseId:
 
                     # update sql
-                    try:
-                        sql = (
-                            "update advert set polonius_caseid="
-                            + str(caseId["referenceNumber"])
-                            + " where advert_id="
-                            + str(row["advert_id"])
-                        )
+                    # try:
+                    sql = (
+                        "update hades.advert set polonius_caseid="
+                        + str(caseId["referenceNumber"])
+                        + " where advert_id="
+                        + str(row["advert_id"])
+                    )
+                    with engine.connect() as connection:
 
-                        with engine.connect() as con:
-                            result = con.execute(sql)
+                        result = connection.execute(sql)
 
-                        logger.info(
-                            "sent case advert_id %s via API and got casenumber : %s",
-                            str(row["advert_id"]),
-                            str(caseId["referenceNumber"]),
-                        )
+                    logger.info(
+                        "sent case advert_id %s via API and got casenumber : %s",
+                        str(row["advert_id"]),
+                        str(caseId["referenceNumber"]),
+                    )
 
-                    except:
-                        print(
-                            "could not connect to sqlite database to update polonius_caseId ,see log"
-                        )
-                        logger.error(
-                            "could not connect to sqlite database to update polonius_caseId with advert_id: %s",
-                            str(row["advert_id"]),
-                        )
+                    # except:
+                    print(
+                        "could not connect to sqlite database to update polonius_caseId ,see log"
+                    )
+                    logger.error(
+                        "could not connect to sqlite database to update polonius_caseId with advert_id: %s",
+                        str(row["advert_id"]),
+                    )
                 else:
 
                     print("problem with sending case to polonius ..see log")
@@ -260,8 +252,9 @@ else:
                 print("error gettin product details see log")
                 logger.error(
                     "Problem with getting product details for : %s and business %s",
-                    str(row["advert_id"]),str(row["business"])
-                            )
+                    str(row["advert_id"]),
+                    str(row["business"]),
+                )
 
     else:
         print("problem getting token to access API --see log for details")
