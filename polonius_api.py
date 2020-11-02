@@ -259,10 +259,8 @@ else:
     if df_db.empty or len(df_db) > limit:
 
         logger.warning(
-            "%s suspected cases to process with a limit of %s cases. Please check that df_db is not 0 or above the limit",
-            str(len(df_db)),
-            str(limit),
-        )
+            f"{str(len(df_db))} suspected cases to process with a limit of {str(limit)} cases. Please check that df_db is not 0 or above the limit",
+           )
 
         sys.exit("Number of suspected cases 0 or above limit ..please check")
 
@@ -290,28 +288,34 @@ else:
                         Url=config.caseUrl, headers=token, casePayload=casePayload
                     )
 
-                    
-                    sql = (
-                            "update hades.advert set polonius_caseid="
-                            + str(caseId["referenceNumber"])
-                            + " where advert_id="
-                            + str(row["advert_id"])
+                except Exception as e:   
+                        logger.error(f"There was a problem sending data to the polonius API for advert id{row['advert_id']}")
+                        logger.error(f"error message associated with this{str(e)}")
+
+                else:
+
+                    try:
+                        sql = (
+                                "update hades.advert set polonius_caseid="
+                                + str(caseId["referenceNumber"])
+                                + " where advert_id="
+                                + str(row["advert_id"])
+                            )
+
+                        with engine.connect() as connection:
+
+                            result = connection.execute(sql)
+
+                        logger.info(
+                            "sent case advert_id %s via API and got casenumber : %s",
+                            str(row["advert_id"]),
+                            str(caseId["referenceNumber"]),
                         )
 
-                    with engine.connect() as connection:
+                    except Exception as e:
 
-                        result = connection.execute(sql)
-
-                    logger.info(
-                        "sent case advert_id %s via API and got casenumber : %s",
-                        str(row["advert_id"]),
-                        str(caseId["referenceNumber"]),
-                    )
-
-                except Exception as e:
-
-                    logger.error(f"There was a problem sending data to the polonius API or sending the Caseid to mysql for advert id{row['advert_id']}")
-                    logger.error(f"error message associated with this{str(e)}")
+                        logger.error(f"There was a problem sending the Caseid number to mysql for advert id{row['advert_id']}")
+                        logger.error(f"Check if case has gone to polonius before rerunning script ! error message associated with this{str(e)}")
 
     
     else:
