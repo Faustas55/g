@@ -203,7 +203,7 @@ def get_cases(category, Notthisuser):
 
 def send_data(headers, Url, casePayload):
     """
-    Send the data payload to the the polonius API 
+    Send the data payload to the polonius API 
 
     args:
 
