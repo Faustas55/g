@@ -249,7 +249,7 @@ df_db = get_cases(category=["'suspected counterfeiter'"], Notthisuser="'upload'"
 
 
 # a string comes back if an error or if cases then a dataframe
-if isinstance(df_db, types.StringType):
+if isinstance(df_db, str):
 
     logger.error(f"No records to send to polonius. Error message: {df_db}")
 
