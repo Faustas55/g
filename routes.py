@@ -344,7 +344,7 @@ def takedown_pendingoutput():
 
         # getting the date which will be written into the csv titles.
         now = datetime.now()
-        date = now.strftime('%Y%b%d_%HH%MM')
+        date = now.strftime('%Y%m%d_%HH%MM')
 
         # starting a loop for each domain
         for domain, data in df.groupby('domain'):
