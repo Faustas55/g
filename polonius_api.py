@@ -1,5 +1,5 @@
-# this is the script to take the suspected and takedown cases and import into polonius
-# It has a limit to stop a crazy amount of suspected cases being added by mistake, default is 20
+# this is the script to take the suspected cases and import into polonius
+# It has a limit to stop a crazy amount of suspected cases being added by mistake, default is 30
 # an unlimited number of takedown cases can be sent to polonius
 ##########################
 # run the script with for example to set a limit of 40 suspected cases ..polonius_api.py -c 40
@@ -8,11 +8,13 @@
 # Logging is turned on and is called hades.log
 
 # 03/09 updated so no takedowns are sent only counterfeit cases
+# 02/11 cleaned up the mess and transfered commonly used functions to external py files 
 
 
 import argparse
-import logging
+import logging_utils
 import sys
+import types
 
 import pandas as pd
 import requests
@@ -23,37 +25,37 @@ import mysql_utils
 engine = mysql_utils.get_alchemy_engine()
 
 
-caseId = None
 
-# get any optional arguments e.g polonius_api.py -c 20
+
+# get any optional arguments for limit of cases e.g polonius_api.py -c 20
 parser = argparse.ArgumentParser(
     description="Number of cases to process and send to Polonius via API"
 )
 parser.add_argument(
-    "-c", type=int, help="This sets the limit of cases to process", default=20
+    "-c", type=int, help="This sets the limit of cases to process", default=30
 )
 args = parser.parse_args()
 limit = args.c
 
 
-def set_logging(name, level):
-    # set logging up
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    filelog = logging.FileHandler("hadesv2.log")
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%m/%d/%Y %I:%M:%S %p",
-    )
-    filelog.setFormatter(formatter)
-    logger.addHandler(filelog)
-    return logger
-
-
 # get the authorisation token
 def get_token(url, secret):
-    # Creates header for OAuth request
+    """
+    Get the access token for polonius 
 
+    args:
+
+        url (str) : the Url of the polonius API 
+        secret(str) : secret to send to the API 
+
+
+    Returns:
+        dictionary: API token header
+
+    Notes:
+        returns false if an error found
+
+    """
     payload = {
         "client_secret": secret,
         "client_id": "publicRestCall",
@@ -73,10 +75,24 @@ def get_token(url, secret):
     return {"Authorization": "Bearer " + token, "Content-Type": "text/plain"}
 
 
-# get product_details .. i.e standard prices and categories for any sub category e.g professional solutions is a sub cat of crop protection
-# We have set the figures here
-def get_product_details(business):
 
+def get_product_details(business):
+    """
+    Get the standard prices per quantity and categorys per business unit e.g professional solutions is a sub cat of crop protection
+
+    args:
+
+        business (str) : business unit
+        
+
+
+    Returns:
+        list: businessUnit, category, price, quantity
+
+    Notes:
+        if an error found returns list: [False, False, False, False]
+
+    """
     switcher = {
         "Crop Protection": ["Crop Protection", "Crop", "35", "2"],
         "Seeds": ["Seeds", "Seed", "20", "5"],
@@ -92,8 +108,29 @@ def get_product_details(business):
     return switcher.get(business, [False, False, False, False])
 
 
-# payload is the case data to send to polonius
+
 def get_casePayload(row, businessUnit, category, price, quantity):
+
+    """
+    Make and format the data payload for the polonius API 
+
+    args:
+
+        row (dataframe) : row of the dataframe containing an adverts data 
+        businessUnit (str) : businessunit of the advert
+        category (str) : the adverts category (seeds,crop protection,professional solutions)
+        price (str): price of the advert 
+        quantity (str): quantity found in the advert
+
+
+    Returns:
+        dictionary: payload to send to API 
+
+    Notes:
+        
+
+    """
+
 
     # get rid of "null" comments in polonius
     comments = lambda comment: " " if comment == None else comment
@@ -126,102 +163,141 @@ def get_casePayload(row, businessUnit, category, price, quantity):
     }
 
 
+
+
 def get_cases(category, Notthisuser):
+    """
+    Make and format the data payload for the polonius API 
+
+    args:
+
+        category (str) : the category to search for e.g suspected counterfeiter
+        Notthis user(str) : do not include this user in the updated_by field of hades db in the search results 
+
+    Returns:
+        dateframe: cases found 
+
+    Notes:
+        error : sends the error messages as a str
+
+    """
+
+
+
+
     categories = ",".join(category)
     sql = f"SELECT * FROM hades.advert where category in ({categories}) and polonius_caseid is null and updated_by !={Notthisuser} "
 
-    with engine.connect() as connection:
+    try:
+        with engine.connect() as connection:
 
-        return pd.read_sql(sql, connection)
+            return pd.read_sql(sql, connection)
+
+    except Exception as e:
+
+        return str(e)
 
 
-# send all ze data to polonius
+
+
+
 def send_data(headers, Url, casePayload):
+    """
+    Send the data payload to the the polonius API 
+
+    args:
+
+        headers (str) : authorisation token
+        Url (str) : url to the polonius API
+        casePayLoad (dictionary) : the adverts category (seeds,crop protection,professional solutions)
+        
+
+    Returns:
+        json: The API return data 
+
+    Notes:
+         error : returns the error messages as a str        
+
+    """
+
+
+
+
     try:
         r = requests.post(url=Url, headers=headers, json=casePayload)
 
-    except:
-        logger.error("There is a problem with connecting to the API")
-        return False
+        if r.json()["taskId"] == "0":
 
-    if r.json()["taskId"] == "0":
-
-        logger.error("case was not added please check the payload %s ", casePayload)
-        return False
-    else:
-        return r.json()
+            logger.error("case was not added please check the payload %s ", casePayload)
+            return False
+        
+        else:
+            return r.json()
+    
+    except Exception as e:
+        return str(e)
 
 
 ################Start of main program ##########
 # set the log
-logger = set_logging("API", "INFO")
+logger = logging_utils.set_logging("API", "INFO", "HadesLogV2.txt")
 
 
-# get the suspected & takedown cases from hades which have no polonius case number
-
+# get the suspected & cases from hades which have no polonius case number
 
 df_db = get_cases(category=["'suspected counterfeiter'"], Notthisuser="'upload'")
 
 
-count_suspected = len(df_db[df_db["category"] == "suspected counterfeiter"].index)
+# a string comes back if an error or if cases then a dataframe
+if isinstance(df_db, types.StringType):
 
-
-if df_db.empty:
-
-    logger.info(" No records to send to polonius")
+    logger.error(f"No records to send to polonius. Error message: {df_db}")
 
 else:
 
-    if count_suspected > limit:
-
-        #
-        # df_db = df_db[df_db["category"] == "takedown"]
+    # if cases are 0 or  greater than the limit set in arguments e.g polonius_api.py -c 40
+    if df_db.empty or len(df_db) > limit:
 
         logger.warning(
-            "%s suspected cases to process with a limit of %s cases. Please confirm these number of suspected cases are correct",
-            str(count_suspected),
+            "%s suspected cases to process with a limit of %s cases. Please check that df_db is not 0 or above the limit",
+            str(len(df_db)),
             str(limit),
         )
 
-        sys.exit("Number of suspected cases above limit ..please check")
+        sys.exit("Number of suspected cases 0 or above limit ..please check")
 
-    # get header for API
-
+    # get token for polonius API
     token = get_token(config.tokenurl, config.secret)
+
     if token:
 
         # send to polonius the cases
 
         for index, row in df_db.iterrows():
 
-            businessUnit, category, price, quantity, = get_product_details(
-                row["business"]
-            )
+            businessUnit, category, price, quantity, = get_product_details(row["business"])
+            
+            # check something has come back by looking for a category which every case has.
             if category:
-                casePayload = get_casePayload(
-                    row, businessUnit, category, price, quantity,
-                )
-
-                if row.category == "suspected counterfeiter":
+                
+                try:
+                    # get and format the payload for the API
+                    casePayload = get_casePayload(
+                        row, businessUnit, category, price, quantity
+                    )
+                    # send the data to API
                     caseId = send_data(
                         Url=config.caseUrl, headers=token, casePayload=casePayload
                     )
 
-                # elif row.category == "takedown":
-                #   caseId = send_data(
-                #        Url=infringUrl, headers=token, casePayload=casePayload
-                #    )
-
-                if caseId:
-
-                    # update sql
-                    # try:
+                    
                     sql = (
-                        "update hades.advert set polonius_caseid="
-                        + str(caseId["referenceNumber"])
-                        + " where advert_id="
-                        + str(row["advert_id"])
-                    )
+                            "update hades.advert set polonius_caseid="
+                            + str(caseId["referenceNumber"])
+                            + " where advert_id="
+                            + str(row["advert_id"])
+                        )
+
                     with engine.connect() as connection:
 
                         result = connection.execute(sql)
@@ -232,30 +308,13 @@ else:
                         str(caseId["referenceNumber"]),
                     )
 
-                    # except:
-                    print(
-                        "could not connect to sqlite database to update polonius_caseId ,see log"
-                    )
-                    logger.error(
-                        "could not connect to sqlite database to update polonius_caseId with advert_id: %s",
-                        str(row["advert_id"]),
-                    )
-                else:
+                except Exception as e:
 
-                    print("problem with sending case to polonius ..see log")
+                    logger.error(f"There was a problem sending data to the polonius API or sending the Caseid to mysql for advert id{row['advert_id']}")
+                    logger.error(f"error message associated with this{str(e)}")
 
-                    logger.error(
-                        "Problem with the Polonius API for advert_id: %s",
-                        str(row["advert_id"]),
-                    )
-            else:
-                print("error gettin product details see log")
-                logger.error(
-                    "Problem with getting product details for : %s and business %s",
-                    str(row["advert_id"]),
-                    str(row["business"]),
-                )
-
+    
     else:
-        print("problem getting token to access API --see log for details")
+        
+        logger.error("Problem with the Polonius API - No token recieved from API ")
 
