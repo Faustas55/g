@@ -9,7 +9,7 @@ import pandas as pd
 import config
 import pymysql
 pymysql.install_as_MySQLdb()
-import MySQLdb
+
 
 
 
