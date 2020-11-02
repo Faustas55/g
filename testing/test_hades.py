@@ -1,5 +1,5 @@
 import pytest
-from .polonius_api import send_data,get_token,get_casePayload
+from polonius_api import send_data,get_token,get_casePayload
 
 
 caseUrl = "https://syngenta.poloniouslive.com/syngentatraining/public/oauth/task/v1/mapping/HadesNoProduct"
