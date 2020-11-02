@@ -5,7 +5,7 @@ import numpy as np
 import re
 import pymysql
 pymysql.install_as_MySQLdb()
-import MySQLdb
+
 
 
 from flask_sqlalchemy import SQLAlchemy
