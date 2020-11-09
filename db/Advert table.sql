@@ -64,4 +64,7 @@ ALTER TABLE advert
  ADD COLUMN review TEXT; 
  
 ALTER TABLE advert
- ADD COLUMN justification TEXT;    
+ ADD COLUMN justification TEXT;  
+ 
+ALTER TABLE hades.advert 
+  MODIFY COLUMN advert_id INT AUTO_INCREMENT;
