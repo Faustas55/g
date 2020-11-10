@@ -1,20 +1,19 @@
-# script to import data from the splunk online report
-# into hades db on sqlite
-
-
-# TODO Add a default for Type to distributer if null -RICH 
-
-
-
 import sys
+sys.path.insert(1, '/Hades/HadesV2App/')
+from config import username, password, database
 import datetime
 import logging
 import numpy as np
 import pandas as pd
-import sqlite3
+import re
 from sqlalchemy import create_engine
 from sqlalchemy.types import Integer, Text
 from pathlib import Path
+
+import pymysql
+pymysql.install_as_MySQLdb()
+import MySQLdb
+
 
 #set up database path 
 path=Path.cwd()
@@ -36,45 +35,15 @@ logger=set_logging('IMPORT DATA','INFO')
 
 
 try:
-    #opening a connection to the database. Update with a correct path directory
-    MainCon=sqlite3.connect(db_path)
-    #opening a connection to the backup file
-    BackupCon=sqlite3.connect(dbbak_path)
-
-except sqlite3.OperationalError as error:
-    print('error -see log')
-    logger.error(f'database has not been backed up: {error}')
-    sys.exit()
-
-
-
-
-    #backup
-
-
-with BackupCon:
-    MainCon.backup(BackupCon, pages=0)
-
-
-
-
-#closing connections 
-MainCon.close()
-BackupCon.close()
-
-
-try:
-    engine = create_engine("sqlite:///db/hades.db", echo=True)
-except sqlite3.OperationalError as error:
+    engine = create_engine('mysql://'+ username +":" + password +"@localhost/"+ database, echo=True)
+except MySQLdb.OperationalError as error:
     logger.error(f'can not create engine:{error} ')
 
    
 
 # we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 11:00am Basel time)
-import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
+Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
-# debugging and test purposes
-#import_file = "C:\\temp\\online.csv"
 
 #import filter that categorizes adds by brands and business
 filter_brands=pd.read_csv( 
@@ -196,124 +165,130 @@ df_db = pd.read_sql("SELECT * FROM advert", engine)
 #lets get the CS manager table as a df 
 df_csm = pd.read_sql("SELECT SP_firstname,SP_lastname,country FROM CSM ",engine)
 
-# read in the csv from splunk
-df = pd.read_csv(import_file)
-# print(df.head())
+def filtering():
+    # read in the csv from splunk
+    df = pd.read_csv(import_file)
+    # print(df.head())
 
-#set the default for type ..if null then set as Distributor
-df['type']=df.apply(lambda x: 'distributor' if pd.isnull(x['type']) else x['type'],axis=1)
+    #set the default for type ..if null then set as Distributor
+    df['type']=df.apply(lambda x: 'distributor' if pd.isnull(x['type']) else x['type'],axis=1)
 
+    #remove all special characters
+    df['keywords'] = df['product'].str.lower().str.split().apply(lambda x: [re.sub(r'\W+',' ', y) for y in x])
+    #splitting strings based on whitespaces, but this creates lists within a list
+    df['keywords'] = df['keywords'].apply(lambda x: [re.split('\s+', s) for s in x])  
+    #flattening the list
+    df['keywords'] = df['keywords'].apply(lambda x: [item for sublist in x for item in sublist])     
 
-#grouping by sellers by their category and reseting the index so we are able to merge
-df_groupedby=df_db.groupby(['seller','category']).size().unstack(level=1, fill_value=0).reset_index()
-df_categories = df_db[["seller", "domain","category"]].copy()
+    #comparing the filter with the keywords, if there's a hit it gets written into the 'product_brand' column as a list 
+    df['product_brand'] = df['keywords'].apply(lambda x: [item for item in x if item in filter_brands['product_brand'].tolist()])
 
-#merging, dropping, and renaming the columns so it's easier later on when we join this with the main df
-df_categories = pd.merge(df_db, df_groupedby, on="seller", how="right")
-df_categories.drop(columns_dfcategories, axis=1, inplace=True)
-df_categories.rename(columns={"no action":"no_action", "suspected counterfeiter":"suspected_counterfeiter", "takedown_y":"takedown"}, inplace=True) 
-    
- #duplicating the product column which is then used to split the strings into keywords
-df['keywords'] = df['product'].str.lower().str.split()
+    # list transformed to string  
+    df['product_brand'] = df['product_brand'].apply(lambda x: ','.join(map(str, x)))
 
-#comparing the filter with the keywords, if there's a hit it gets written into the 'product_brand' column as a list 
-df['product_brand'] = df['keywords'].apply(lambda x: [item for item in x if item in filter_brands['product_brand'].tolist()])
-# list transformed to string  
-df['product_brand'] = df['product_brand'].apply(lambda x: ','.join(map(str, x)))
+    #deleting everything after a comma if there's another string. Only need 1 keyword for splunk dashboards,but leaving the option to have all keyword hits if we need     
+    df['product_brand'] = df['product_brand'].str.split(',').str[0]
 
-#deleting everything after a comma if there's another string. Only need 1 keyword for splunk dashboards,but leaving the option to have all keyword hits if we need     
-df['product_brand'] = df['product_brand'].str.split(',').str[0]
+    #replacing all empty values with NaN that then get filled with 'None'
+    df = df.replace('', np.nan)
+    df['product_brand'].fillna(value="None", inplace=True)
 
-#replacing all empty values with NaN that then get filled with 'None'
-df = df.replace('', np.nan)
-df['product_brand'].fillna(value="None", inplace=True)
+    #merging the filter with the brands to get business information
+    df=pd.merge(df, filter_brands, on="product_brand", how="left")
+    df['product_brand']=df['product_brand'].str.lower()
 
-#merging the filter with the brands to get business information
-df=pd.merge(df, filter_brands, on="product_brand", how="left")
-df['product_brand']=df['product_brand'].str.lower()
+    #make sure the country is capitilised so there is only one country in the results =< Changed to str.title() to fix capitalization issues
+    df["country"]=df["country"].str.title()
 
-#make sure the country is capitilised so there is only one country in the results =< Changed to str.title() to fix capitalization issues
-df["country"]=df["country"].str.title()
+    # merging df with country and region database, renaming the column back into "region" - F
+    df = pd.merge(df, df_region, on="country", how="left")
+    df = df.rename(columns={"region_y": "region"})
 
-# merging df with country and region database, renaming the column back into "region" - F
-df = pd.merge(df, df_region, on="country", how="left")
-df = df.rename(columns={"region_y": "region"})
+    #right lets add in to the df any responsible country security managers
+    df = pd.merge(df,df_csm,on="country", how="left")
+    return df 
 
-
-
-#right lets add in to the df any responsible country security managers
-df = pd.merge(df,df_csm,on="country", how="left")
-
-
-# drop some more useless columns before we merge again
-df.drop(["score", "set_category"], axis=1, inplace=True)
+df_filtered=filtering()
 
 # merge so we only get new adverts .New adverts=new seller + domain + product
 df_merge = df_db.merge(
-    df, indicator=True, how="outer", on=["seller", "product", "domain"]
+    df_filtered, indicator=True, how="outer", on=["seller", "product", "domain"]
 )
 
-
-
 # take only the right sided ones . these are adverts that are not in the sqlite database ..i.e the new ones
-df = df_merge[df_merge["_merge"] == "right_only"]
+df_filtered = df_merge[df_merge["_merge"] == "right_only"]
 
 # check to see if we have any new adverts before proceeding
-if not df.empty:
+if not df_filtered.empty:
+
     # drop all the useless columns created by the merge .. i.e the adverts already in database
-    df.drop(columns_drop, axis=1, inplace=True)
-    
-
+    df_filtered.drop(columns_drop, axis=1, inplace=True)
     # rename the columns so it fits the table fields in sqlite
-    df = df.rename(columns=rename_cols)
-    # merging the seller statistics with the main df
-    df= pd.merge(df, df_categories, on=['seller'], how="left")
-    df.rename(columns={'no_action_y':'no_action', "No action all":"no_action_all", 'suspected_counterfeiter_y':'suspected_counterfeiter', 'takedown_y':'takedown', 'review_x':"review", 'justification_x':"justification" }, inplace=True)
-    #adds no action all and no action together
-    df['no_action'] = df['no_action'] + df['no_action_all']
-    df.drop(columns=['no_action_x', 'takedown_x', 'suspected_counterfeiter_x', 'review_y', 'justification_y', 'no_action_all', 'no action all'], axis=1, inplace=True)
-    df.drop_duplicates(subset=['url','domain'],inplace=True)
-    # fillna so we get a numerical value instead of none
-    df[['no_action', 'suspected_counterfeiter','takedown']]=df[['no_action', 'suspected_counterfeiter','takedown']].fillna(value=0)
+    df_filtered = df_filtered.rename(columns=rename_cols)
 
-    #get rid of duplicates 
-    df.drop_duplicates(subset=['seller','domain','product'],inplace=True)
+    def analyse_sellers():
+        #grouping by sellers by their category and reseting the index so we are able to merge
+        df_groupedby=df_db.groupby(['seller','category']).size().unstack(level=1, fill_value=0).reset_index()
+        df_categories = df_db[["seller", "domain","category"]].copy()
+
+        #merging, dropping, and renaming the columns so it's easier later on when we join this with the main df
+        df_categories = pd.merge(df_db, df_groupedby, on="seller", how="right")
+        df_categories.drop(columns_dfcategories, axis=1, inplace=True)
+
+        df_categories.rename(columns={"no action":"no_action", "suspected counterfeiter":"suspected_counterfeiter", "takedown_y":"takedown"}, inplace=True) 
+        return df_categories
+
+    def seller_stats():
+        df_categories=analyse_sellers()
+        # merging the seller statistics with the main df
+        df_processed= pd.merge(df_filtered, df_categories, on=['seller'], how="left")
+        df_processed.rename(columns={'no_action_y':'no_action', "No action all":"no_action_all", 'suspected_counterfeiter_y':'suspected_counterfeiter', 'takedown_y':'takedown', 'review_x':"review", 'justification_y':"justification" }, inplace=True)
+        #adds no action all and no action together
+        df_processed['no_action'] = df_processed['no_action'] + df_processed['no_action_all']
+        df_processed.drop(columns=['no_action_x', 'takedown_x', 'suspected_counterfeiter_x', 'review_y', 'justification_x', 'no_action_all', 'no action all', 'Outofstock/Paused'], axis=1, inplace=True)
+        df_processed.drop_duplicates(subset=['url','domain'],inplace=True)
+        # fillna so we get a numerical value instead of none
+        df_processed[['no_action', 'suspected_counterfeiter','takedown']]=df_processed[['no_action', 'suspected_counterfeiter','takedown']].fillna(value=0)
+
+        #get rid of duplicates 
+        df_processed.drop_duplicates(subset=['seller','domain','product'],inplace=True)
+        return df_processed
     
-
-    logger.info('number of new cases to upload %s',df.shape[0])
+    df_processed=seller_stats()
+   # logger.info('number of new cases to upload %s',df.shape[0])
     
     # set category to lowercase
-    df["category"] = df["category"].str.lower()
+    df_processed["category"] = df_processed["category"].str.lower()
   
 
     # this is for SQLite rowid which is a primary key, send in a null object and sqlite will sort this out
-    df.loc[:, "advert_id"] = None
+    df_processed.loc[:, "advert_id"] = None
 
     # make polonius_caseid null
-    df.loc[:, "polonius_caseid"] = None
+    df_processed.loc[:, "polonius_caseid"] = None
 
     # set that the "upload user " has updated
-    df.loc[:, "updated_by"] = "upload"
+    df_processed.loc[:, "updated_by"] = "upload"
     # and when uploaded
-    df.loc[:, "uploaded_date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    df_processed.loc[:, "uploaded_date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     
 
     
     #make sure the country is capitilised so there is only one country in the results
-    df["country"]=df["country"].str.title()
+    df_processed["country"]=df_processed["country"].str.title()
 
     # get rid of non -relevant sellers adverts
-
-    df=df[df['category'] != 'not relevant']
+    
+    df_processed=df_processed[df_processed['category'] != 'not relevant']
 
     # write out the csv to be uploaded ..this is now just a backup
    
     #df.to_csv(export_file, index=False, columns=export_cols)
     # write the adverts back to the table "advert" as one big hit
-    
+
     try:
-        df.to_sql(
+        df_processed.to_sql(
             "advert",
             con=engine,
             if_exists="append",
@@ -321,7 +296,7 @@ if not df.empty:
             dtype={"business": Text(), "product_brand": Text()},
         )
 
-    except sqlite3.Error as error:
+    except MySQLdb.Error as error:
         logger.error(f"error uploading adverts to SQLlite :{error}")
         print('error please check log')
 else:
