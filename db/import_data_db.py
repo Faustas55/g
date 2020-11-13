@@ -42,8 +42,7 @@ except MySQLdb.OperationalError as error:
    
 
 # we need to change this to collect the file from where splunk saves it. (I set Splunk to save the file every Monday 11:00am Basel time)
-Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
-
+import_file = Path(r"C:\Program Files\Splunk\var\run\splunk\csv\splunk_online_output.csv")
 
 #import filter that categorizes adds by brands and business
 filter_brands=pd.read_csv( 
