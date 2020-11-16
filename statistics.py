@@ -30,4 +30,4 @@ df_groupedby.drop(columns={'uncategorised\nuncategorised', 'syngenta authorised'
 df_groupedby.loc[:, "uploaded_date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 #export
-df_groupedby.to_csv(r"C:\Splunk\intel\hadesresults\hadesstatistics.csv", mode='a', header=True, index=False)
+df_groupedby.to_csv(r"C:\Splunk\intel\hadesresults\hadesstatistics.csv", mode='a', header=False, index=False)
