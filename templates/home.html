@@ -15,12 +15,12 @@ Home
     <form id="formCountry" ,action="home" method="POST">
         <p>Please select a country</p>
         <select id="country" name="country">
+        {% for i in combined %}
+            {% for country,uncategorised in i.items() %}
 
-            {%for country in countries%}
-
-            <option value="{{country}}">{{country}}</option>
+            <option value="{{country}}">{{country}} (Uncategorised Ads:{{uncategorised}})</option>
             {%endfor%}
-
+        {%endfor%}
         </select>
 
         <button class="btncountry" id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>
