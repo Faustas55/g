@@ -72,24 +72,26 @@ def set_no_action_all(advert_id, user):
 
 
 @app.route("/", methods=["GET", "POST"])
-def home():
+def home(category='uncategorised'):
 
-    # Intercepts the post back to redirect to adverts.html and the selected country
+    # Intercepts the post back to redirect to home and the selected country
+    # unpacks the dictionary that gets sent back from the dropdown menu
     if request.method == "POST":
+        for key, val in request.form.items("country"):
+         return redirect(url_for("getadverts", country=val))
 
-        return redirect(url_for("getadverts", country=request.form.get("country")))
-
-    # get a list of countries from the database and sort alphabetically 
+    #Sending a dictionary to the page: {'Country':Number of uncategorised ads}
+    df=pd.read_sql(
+    sql=db.session.query(Advert.country, func.count(Advert.category))
+    .filter(Advert.category == category)
+    .group_by(Advert.country)
+    .order_by(Advert.country.asc()).statement,
+    con=db.session.bind
+    )
     
-    countries = [
-        country[0]
-        for country in Advert.query.with_entities(Advert.country).distinct().all()
-    ]
-
-    countries=sorted(countries)
+    combined=[{df['country'][i]: df['count_1'][i] for i in range(len(df['country']))}]
    
-
-    return render_template("home.html", countries=countries)
+    return render_template("home.html", combined=combined )
 
 
 @app.route("/getadverts")
