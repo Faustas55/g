@@ -25,6 +25,11 @@ uploaddate=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 user='upload'
 outofstockcat='Outofstock/Paused'
 
+# **********CONFIGURATION******************* 
+# how the script decides if an advert is 404 or the advert has ended - 
+# Please add other languages and terms in list below !
+ended=['end','terminee', 'NotFound', 'No disponible','Not availiable']
+
 ## class customised for finding the out of stock -ebay and pasued adverts mercadolibra
 class AdvertSpider(scrapy.Spider):
 
@@ -32,6 +37,10 @@ class AdvertSpider(scrapy.Spider):
 
     custom_settings = {
         'USER_AGENT': 'Mozilla/5.0 ',
+        'DOWNLOAD_DELAY' :1.5,
+        'AUTOTHROTTLE_ENABLED' :True,
+        'AUTOTHROTTLE_START_DELAY' : 2,
+        'AUTOTHROTTLE_TARGET_CONCURRENCY': 6,
     }
 
     def start_requests(self):
@@ -51,14 +60,25 @@ class AdvertSpider(scrapy.Spider):
 
     def parse(self, response):
         #ebay first 
-        msg=response.css('span.msgTextAlign::text').get()
-        #mercadolibre second try 
-        if msg==None:
+        msg='Out of Stock'
+        
+        #404 response e.g lazarda
+        if response.status==404:
+            msg='NotFound'
+
+        elif 'ebay' in response.url:
+            msg=response.css('span.msgTextAlign::text').get()
+        
+        elif 'mercadolibre' in response.url:
             msg=response.css('p.item-status-notification__title::text').get()
+
+        elif 'amazon' in response.url:
+            msg=response.css('span.a-size-medium.a-color-price::text').get()
         
         msg_dict[response.meta['advert_id']]=msg
 
-    
+       
+       
        
        
 
@@ -155,7 +175,7 @@ msg_dict=dict()
 
 #obtain list of urls from hades (where category=out of stock\paused)
 urls=get_outofstock_adverts(f"select url,advert_id from advert where category='{outofstockcat}'")
-
+urls=urls[0:10]
 
 #run the spider
 process=CrawlerProcess()
@@ -171,8 +191,13 @@ for key,value in msg_dict.items():
         comments=f'\\n This advert was being monitored (out of stock) category changed to {uncategorised}'
         rows=update_db(f"update advert set category='{uncategorised}',updated_by='{user}',updated_date='{uploaddate}',comments=CONCAT_WS('',comments,'{comments}') where advert_id='{key}'")
 
-    #404 type situation    
-    if value=='NotFound':
-        comments=f'\\n This advert was being monitored (out of stock) category changed to {noaction}'
+    #404 type situation and listing ended    
+    elif list(filter(lambda x:x in value,ended)):
+        comments=f'\\n This advert was being monitored (out of stock) but not found or has ended. Category changed to {noaction}'
         rows=update_db(f"update advert set category='{noaction}',updated_by='{user}',updated_date='{uploaddate}',comments=CONCAT_WS('',comments,'{comments}') where advert_id='{key}'")
 
+    
+    
+
+
+    # if none of the conditions aboved true then advert is out of stock \paused \not availiable etc to be tested again e.g next week
