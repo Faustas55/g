@@ -250,7 +250,7 @@ if not df_filtered.empty:
         df_processed[['no_action', 'suspected_counterfeiter','takedown']]=df_processed[['no_action', 'suspected_counterfeiter','takedown']].fillna(value=0)
 
         #get rid of duplicates 
-        df_processed.drop_duplicates(subset=['seller','domain','product'],inplace=True)
+        df_processed.drop_duplicates(subset=['url','domain],inplace=True)
         return df_processed
     
     df_processed=seller_stats()
