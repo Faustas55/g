@@ -28,7 +28,7 @@ outofstockcat='Outofstock/Paused'
 # **********CONFIGURATION******************* 
 # how the script decides if an advert is 404 or the advert has ended - 
 # Please add other languages and terms in list below !
-ended=['end','terminee', 'NotFound', 'No disponible','Not availiable']
+searchTerms=['end','terminee', 'No disponible','Not availiable']
 
 ## class customised for finding the out of stock -ebay and pasued adverts mercadolibra
 class AdvertSpider(scrapy.Spider):
@@ -59,7 +59,7 @@ class AdvertSpider(scrapy.Spider):
 
 
     def parse(self, response):
-        #ebay first 
+        
         msg='Out of Stock'
         
         #404 response e.g lazarda
@@ -74,6 +74,10 @@ class AdvertSpider(scrapy.Spider):
 
         elif 'amazon' in response.url:
             msg=response.css('span.a-size-medium.a-color-price::text').get()
+
+        else:
+            #any website not in the above checks put back to uncategorised
+            msg=None
         
         msg_dict[response.meta['advert_id']]=msg
 
@@ -191,8 +195,9 @@ for key,value in msg_dict.items():
         comments=f'\\n This advert was being monitored (out of stock) category changed to {uncategorised}'
         rows=update_db(f"update advert set category='{uncategorised}',updated_by='{user}',updated_date='{uploaddate}',comments=CONCAT_WS('',comments,'{comments}') where advert_id='{key}'")
 
-    #404 type situation and listing ended    
-    elif list(filter(lambda x:x in value,ended)):
+    #404 type situation 
+    # listing ended properly not just paused \out of stock    
+    elif (value=='NotFound') or list(filter(lambda x:x in value,searchTerms)):
         comments=f'\\n This advert was being monitored (out of stock) but not found or has ended. Category changed to {noaction}'
         rows=update_db(f"update advert set category='{noaction}',updated_by='{user}',updated_date='{uploaddate}',comments=CONCAT_WS('',comments,'{comments}') where advert_id='{key}'")
 
