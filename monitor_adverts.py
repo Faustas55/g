@@ -182,7 +182,7 @@ msg_dict=dict()
 
 #obtain list of urls from hades (where category=out of stock\paused)
 urls=get_outofstock_adverts(f"select url,advert_id from advert where category='{outofstockcat}'")
-urls=urls[0:10]
+
 
 #run the spider
 process=CrawlerProcess()
