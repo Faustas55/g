@@ -2,7 +2,7 @@
 #uses scrapy to look for the out of stock message in page HTML 
 #pages obtained from hades mysql 
 #if out of stock message not found update hades category=uncategorised 
-#richard hyams 2020
+#richard hyams 2021
 
 
 
@@ -57,8 +57,11 @@ class AdvertSpider(scrapy.Spider):
                 
            
 
+# This is where you add sites and the css so they can be monitored #
+#if we start getting a lot of sites will make the def more genralised #
 
     def parse(self, response):
+        
         
         msg='Out of Stock'
         
