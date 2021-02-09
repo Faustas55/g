@@ -30,6 +30,65 @@ try:
 except MySQLdb.OperationalError as error:
     logger.error(f'can not create engine:{error} ')
 
+def keyword_mlAPI(site_id,keywords):
+    # Creates variables for pagination
+    data_list = list()
+    # Pagination variables
+    offset = 0
+    total = 0
+    print(keywords)
+            
+    # Paginates through pages of items    
+    while total >= offset:
+            
+        time.sleep(1)
+            
+        # Creates the request url
+        url = 'https://api.mercadolibre.com/sites/' + site_id + '/search?q=' + keywords + '&offset=' + str(offset)
+            
+        # Converts json reply to data
+        data = json.loads(requests.get(url).content)
+                
+         # Adds response items to list
+        items = data['results']
+        print(items)
+                
+            # Adds item fields to dataframe
+        try:
+            for item in items:
+                time.sleep(0.5)
+                seller_id = item['seller']['id']
+                url_seller = 'https://api.mercadolibre.com/users/'+ str(seller_id)
+                data_seller = json.loads(requests.get(url_seller).content)
+                        
+                data_list.append([item['id'],
+                            item['title'],
+                            item['price'],
+                            item['currency_id'],
+                            item['available_quantity'],
+                            item['sold_quantity'],
+                            data_seller['nickname'],
+                            item['seller_address']['state']['name'] + ', ' + item['seller_address']['city']['name'],
+                            data_seller['country_id'],
+                            data_seller['seller_reputation']['transactions']['ratings']['positive']*100,
+                            data_seller['registration_date'][0:10],
+                            item['permalink'],
+                            ]) 
+                            
+                        
+                # Gets total number of pages for search
+                total = data['paging']['total']
+                    
+                # Increases page counter by one for pagination
+                offset += data['paging']['limit']
+        except KeyError:
+            break
+
+    df = pd.DataFrame(data_list, columns=['itemno','product','price','cur','stock','sold','seller','seller_location','seller_country','seller_rating','seller_register','url'])
+    
+    return df
+
+
 def keyword_ebayAPI(globalId, keywords):
     """
     runs API to check ads that we don't find through our daily data download
@@ -136,15 +195,161 @@ def mltakedowns():
     mlAPI = pd.concat(li, axis=0, ignore_index=True)
 
     #get hades results
-    hadessql="SELECT advert_id, url, domain, review FROM hades.advert WHERE category='takedown' AND review='Sent to CSC for Takedown'"
+    hadessql="SELECT product, advert_id, url, domain, review, country FROM hades.advert WHERE category='takedown' AND review='Sent to CSC for Takedown'"
     frame = pd.read_sql(hadessql, dbConnection)
     
     #select rows that begin with www.mercadolibre
     mlads = frame[frame['domain'].apply(lambda x: x.startswith('www.mercadolibre'))]
     #compare hades vs API results
-    successful_takedowns_ml = mlads[~(mlads['url'].isin(mlAPI['url']))].reset_index(drop=True)
+    successful_takedowns_ml_bulk = mlads[~(mlads['url'].isin(mlAPI['url']))].reset_index(drop=True)
+
+    #sending these to additionalML function to re-run the search using the product title
+    additionnal_check_data=additionalCheckML(successful_takedowns_ml_bulk)
+    print(additionnal_check_data)
+    #compare new ads with the initial list
+    successful_takedowns_ML = successful_takedowns_ml_bulk[~(successful_takedowns_ml_bulk['url'].isin(additionnal_check_data['url']))].reset_index(drop=True)
+
+    return successful_takedowns_ML, mlAPI
+
+def additionalCheckML(additional_check_df):
+    #remove all special characters
+    additional_check_df['product'] = additional_check_df['product'].str.lower().str.split().apply(lambda x: [re.sub(r'\W+',' ', y) for y in x])
+    #splitting strings based on whitespaces, but this creates lists within a list
+    additional_check_df['product'] = additional_check_df['product'].apply(lambda x: [re.split('\s+', s) for s in x])  
+    #flattening the list
+    additional_check_df['product'] = additional_check_df['product'].apply(lambda x: [item for sublist in x for item in sublist])  
+    #list to strings
+    additional_check_df['product'] = [','.join(map(str, l)) for l in additional_check_df['product']]
+
+    #replaces commas with " "
+    additional_check_df['product'] = additional_check_df['product'].str.replace(","," ")
     
-    return successful_takedowns_ml, mlAPI
+    list_product = additional_check_df['product'].tolist()
+    list_country = additional_check_df['country'].tolist()
+
+    appended_data=[]
+
+    for product, country in zip(list_product, list_country):
+        print(product, country)
+        if country == "Honduras":
+            site_id = 'MHN'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+        
+        elif country == 'El Salvador':
+            site_id = 'MSV'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+
+        elif country == 'Dominica':
+            site_id = 'MRD'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+        elif country == 'Colombia':
+            site_id = 'MCO'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+
+        elif country == 'Venezuela':
+            site_id = 'MLV'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+        elif country == 'Ecuador':
+            site_id = 'MEC'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+            
+        elif country == 'Nicaragua':
+            site_id = 'MNI'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+
+        elif country == 'Bolivia':
+            site_id = 'MBO'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+
+        elif country == 'Argentina':
+            site_id = 'MLA'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+            
+        elif country == 'Chile':
+            site_id = 'MLC'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+
+        elif country == 'Mexico':
+            site_id = 'MLM'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+            
+        elif country == 'Paraguay':
+            site_id = 'MPY'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+
+        elif country == 'Peru':
+            site_id = 'MPE'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+        elif country == 'Guatemala':
+            site_id = 'MGT'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+        
+        elif country == 'Brazil':
+            site_id = 'MLB'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+
+        elif country == 'Panama':
+            site_id = 'MPA'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+        elif country == 'Uruguay':
+            site_id = 'MLU'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+            
+        elif country == 'Costa Rica':
+            site_id = 'MCR'
+            keywords = "\""  + "[" + product + "]" + "\""
+            individualMLsearch = keyword_mlAPI(site_id, keywords)
+            appended_data.append(individualMLsearch)
+        else:
+            raise Exception('ML API not configured for country')
+    appended_data = pd.concat(appended_data)
+    return appended_data
+
 
 def ebaytakedowns():
     
@@ -245,7 +450,7 @@ def additionalCheckEbay(additional_check_df):
                 keywords = "\""  + "(" + product + ")" + "\""
                 individualEbaysearch = keyword_ebayAPI(globalId, keywords)
                 appended_data.append(individualEbaysearch)
-             elif country == "Belgium":
+            elif country == "Belgium":
                 globalId = "EBAY-FRBE"
                 keywords = "\""  + "(" + product + ")" + "\""
                 individualEbaysearch = keyword_ebayAPI(globalId, keywords)
