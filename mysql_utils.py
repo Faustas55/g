@@ -56,6 +56,27 @@ def get_alchemy_engine():
     db_connection_str = f'mysql+pymysql://{config.username}:{config.password}@{config.host}'
     return create_engine(db_connection_str)
 
+
+
+def get_adverts(sql):
+    """
+    function to get adverts from mysql based on SQL string 
+
+    Args:
+        sql(str): sql to select from  the database
+
+    Returns:
+        dictionary: items retrieved from the select statement 
+
+
+    """
+    with get_mysql_connection() as mydb:
+
+        mycursor=mydb.cursor(dictionary=True)
+
+        mycursor.execute(sql)
+ 
+        return mycursor.fetchall()
     
 
 
