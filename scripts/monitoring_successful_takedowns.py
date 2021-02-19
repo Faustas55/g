@@ -149,7 +149,6 @@ def additionalCheckML(additional_check_df):
     appended_data=[]
 
     for product, country in zip(list_product, list_country):
-        print(product, country)
         if country == "Honduras":
             site_id = 'MHN'
             keywords = "\""  + "[" + product + "]" + "\""
@@ -311,11 +310,10 @@ def keyword_ebayAPI(globalId, keywords):
         
              # Converts json reply to data
         data = json.loads(requests.get(url).content)
-        print(data)
         # Adds response items to list
         try:
             items = data["findItemsByKeywordsResponse"][0]["searchResult"][0]["item"]
-            print(items)
+
             # create a dictionary and then create a dataframe
 
             # Adds item fields to dataframe
@@ -425,7 +423,6 @@ def additionalCheckEbay(additional_check_df):
 
     #assigns correct variables for API calls based on the country
     for product, country in zip(list_product, list_country):
-            print(product, country)
             if country == "United States":
                 globalId = "EBAY-US"
                 keywords = "\""  + "(" + product + ")" + "\""
@@ -531,7 +528,6 @@ def additionalCheckEbay(additional_check_df):
 
 relisted_takedowns_ebay, ebayAPI,  = ebaytakedowns()
 relisted_takedowns_ML, mlAPI, = mltakedowns()
-print("end of loop")
 def oneframe(ebay_takedowns,ml_takedowns):
     #making one dataframe out of two
     if ebay_takedowns.empty & ml_takedowns.empty:
@@ -545,7 +541,29 @@ def oneframe(ebay_takedowns,ml_takedowns):
     return combined_takedowns
 
 combined_takedowns=oneframe(relisted_takedowns_ebay, relisted_takedowns_ML)
-combined_takedowns.to_csv(r'C:\Splunk\relistedtakedowns.csv')
 combined_takedowns=combined_takedowns.drop(columns=['product', 'country'])
+combined_takedowns.set_index("advert_id", inplace=True)
+if combined_takedowns.empty:
+    logger.info('No relisted ads found')
+    
+else:
+    connStr= sqlengine.connect().connection
+    cursor = connStr.cursor()
+    numberofads=0
+    for id_advert in combined_takedowns.index:
+        update_sql="""Update hades.advert SET review='Sent to CSC for Takedown' WHERE advert_id=%s"""
+        cursor.execute(update_sql, id_advert)
+        connStr.commit()
+        delete_sql="""DELETE FROM hades.takedowns WHERE advert_id=%s"""
+        cursor.execute(delete_sql, id_advert)
+        connStr.commit()
+        numberofads+=1
 
+    cursor.close()
+    connStr.close()
+
+
+    logger.info('%s Relisted ads found' % numberofads)
+
+        
 
