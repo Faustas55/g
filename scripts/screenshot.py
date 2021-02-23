@@ -37,7 +37,8 @@ def lst_find_dupl(list1,list2):
 
 #variables to select the relevant adverts 
 
-site='%mercadolibre%'
+#site='%mercadolibre%'
+site='%ebay%'
 review='Sent to CSC for Takedown'
 fromdate ='2021-01-01'
 
@@ -80,10 +81,10 @@ for dict in adverts:
     
     if str(advert_id) in lst_non_dupl:
         driver.get(url)
-        sleep(randint(2, 10))
+        sleep(randint(30, 60))
 
     #S = lambda X: driver.execute_script('return document.body.parentNode.scroll'+X)
-        driver.set_window_size(2000,5000) # May need manual adjustment                                                                                                                
+        driver.set_window_size(2000,4000) # May need manual adjustment                                                                                                                
         driver.find_element_by_tag_name('body').screenshot(os.path.join(path,str(advert_id)+'.png'))
         print(f'Advert {advert_id} screenshotted and saved as {str(advert_id)+".png"}')
 
