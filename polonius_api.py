@@ -194,7 +194,7 @@ def get_takedowns():
         return str(e)
 
 
-    thirtydays = date.today() - timedelta(25)
+    thirtydays = date.today() - timedelta(30)
 
     df["takedown_confirmed"] = pd.to_datetime(df["takedown_confirmed"]).dt.date
 
