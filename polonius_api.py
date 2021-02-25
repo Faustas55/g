@@ -171,10 +171,8 @@ def get_takedowns():
 
     args:
 
-        category (str) : Takedown
-
     Returns:
-        dateframe: cases found 
+        dateframe: successful takedowns
 
     Notes:
         error : sends the error messages as a str
@@ -199,8 +197,6 @@ def get_takedowns():
     df["takedown_confirmed"] = pd.to_datetime(df["takedown_confirmed"]).dt.date
 
     df = df[(df['takedown_confirmed'] <=thirtydays)]
-
-    df = df.drop(columns=['url','domain','review'], axis=1)
 
     df_db = df_db[(df_db.advert_id.isin(df.advert_id))]
 
@@ -287,9 +283,9 @@ logger = logging_utils.set_logging("API", "INFO", "HadesLogV2.txt")
 # get the suspected & cases from hades which have no polonius case number
 
 df_db = get_cases(category=["'suspected counterfeiter'"], Notthisuser="'upload'")
-
+# get takedowns that have been confirmed as successful takedowns
 df_takedowns = get_takedowns()
-
+# append takedowns to the suspected cases DF
 df_db = df_db.append(df_takedowns)
 # a string comes back if an error or if cases then a dataframe
 if isinstance(df_db, str):
@@ -326,6 +322,7 @@ else:
                     casePayload = get_casePayload(
                         row, businessUnit, category, price, quantity
                     )
+                    #check if a case is a suspected counterfeit or takedown
                     if row.category == "suspected counterfeiter":
                         # send the data to API
                         caseId = send_data(
