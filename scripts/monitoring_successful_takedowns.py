@@ -112,7 +112,7 @@ def mltakedowns():
     mlAPI = pd.concat(li, axis=0, ignore_index=True)
 
     #get hades results
-    hadessql="SELECT product, advert_id, url, domain, review, country FROM hades.advert WHERE category='takedown' AND review='Successful Takedown'"
+    hadessql="SELECT product, advert_id, url, domain, review, country FROM hades.advert WHERE category='takedown' AND review='Successful Takedown' AND polonius_caseid IS NULL"
     frame = pd.read_sql(hadessql, dbConnection)
     
     #select rows that begin with www.mercadolibre
@@ -371,7 +371,7 @@ def ebaytakedowns():
     #list to dataframe
     ebayAPI = pd.concat(li, axis=0, ignore_index=True)
     #get hades results
-    hadessql="SELECT product, advert_id, url, domain, review, country FROM hades.advert WHERE category='takedown' AND review='Successful Takedown'"
+    hadessql="SELECT product, advert_id, url, domain, review, country FROM hades.advert WHERE category='takedown' AND review='Successful Takedown' AND polonius_caseid IS NULL"
     frame = pd.read_sql(hadessql, dbConnection)
     #select rows that begin with www.ebay
     ebayads = frame[frame['domain'].apply(lambda x: x.startswith('www.ebay'))]
