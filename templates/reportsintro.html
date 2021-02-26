@@ -1,0 +1,76 @@
+<!DOCTYPE>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='animations.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='components.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='content-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fullpage.twoside.css')}}" />    
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='image-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.min.css')}}" />
+</head>
+<header>
+    <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-main navbar-middle">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav" >
+                        <li><a href="{{ url_for('takedown_home') }}"><b>Review</b></a></li>
+                        <li><a href="{{ url_for('takedown_pendingoutput') }}"><b>Export</b></a></li>
+                        <li class="logo-item"><a href="https://syngenta.sharepoint.com/sites/mySyngenta/"><img src="{{url_for('static', filename='SGlogo1.png')}}" alt="logo" ></a></li>
+                        <li><a href="{{ url_for('takedown_CSMpending') }}"><b>Pending with CSM</b></a></li>
+                        <li><a href="{{ url_for('reportsintro') }}"><b>Reports</b></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class='float-container'>
+    <div class='float-child'>
+        <div>
+            <a href="{{url_for('reports_takedowns')}}"><h3>Review Pending Takedowns</h3></a>
+        </div>
+    </div>
+    <div class='float-child'>
+        <div>
+            <a href="{{url_for('reports_highlevel')}}"><h3>High-level Reports</h3></a>
+        </div>
+    </div>  
+    <div class='float-child'>
+        <div>
+            <a href="{{url_for('reports_successfultakedown')}}"><h3>Succesful Takedowns</h3></a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer footer-center-home">
+    <div class="content">
+       <div class="container">
+           <div class="row footer-main">
+               <img src="{{url_for('static', filename='Logo2.png')}}"/>
+               <hr class="space xs" />
+           </div>
+           <div class="row copy-row">
+               <div class="col-md-12 copy-text">
+                   <div class="tag-row">
+                       <span>Hades Created By Corporate Security Online Team © 2021</span>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <!-- SCRIPTS AND STYLES HERE -->
+</footer>
+
+</html>

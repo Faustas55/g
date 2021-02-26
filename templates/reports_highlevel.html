@@ -1,0 +1,120 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='animations.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='components.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='content-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fullpage.twoside.css')}}" />    
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='image-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='datatables.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.min.css')}}" />
+    
+</head>
+<header>
+    <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-main navbar-middle">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav" >
+                      <li><a href="{{ url_for('takedown_home') }}"><b>Review</b></a></li>
+                      <li><a href="{{ url_for('takedown_pendingoutput') }}"><b>Export</b></a></li>
+                      <li class="logo-item"><a href="https://syngenta.sharepoint.com/sites/mySyngenta/"><img src="{{url_for('static', filename='SGlogo1.png')}}" alt="logo" ></a></li>
+                      <li><a href="{{ url_for('takedown_CSMpending') }}"><b>Pending with CSM</b></a></li>
+                      <li><a href="{{ url_for('reportsintro') }}"><b>Reports</b></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      
+        </style>
+        
+        <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.bootstrap.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.print.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.colVis.min.js"></script>
+        
+        <script type="text/javascript" class="init">
+
+            $(document).ready(function() {
+                var table = $('#example').DataTable( {
+                lengthChange: false,
+                scrollY: '250px',
+                scrollCollapse: true,
+                "sDom": '<"top"ip>rt<"bottom"fl><"clear">',
+                "dom": '<"pull-left"f><"pull-right"l>tip',
+                dom: 'Bfrtip',
+                buttons: [ 'excel' ]
+            } );
+            $('#example').closest('.dataTables_scrollBody').css('max-height', '80%');
+            $('#example').DataTable().draw();
+          } );
+        </script>
+<head>
+    <meta charset="UTF-8">
+    <title>High Level Reporting</title>
+    <h2>High Level Reporting</h2>
+</head>
+<form  action="/reports_highlevel" method="post">
+    <label for="Start Date">Start Date</label>
+    <input type="date" id="Start Date" name="Start Date">
+    <label for="End Date">Start Date</label>
+    <input type="date" id="End Date" name="End Date">
+    <input type="submit">
+</form>
+
+
+<body>
+    <table id="example" class="table-striped" style="width:100%, height: 100%">
+        <thead>
+            <tr>
+                <th>Region</th>
+                <th>Country</th>
+                <th>Ads Detected by Scrapers</th>
+                <th>Takedowns Reviewed</th>
+                <th>Sent for Takedown</th>
+                <th>Successful Takedowns</th>
+                <th>Crop Protection</th>
+                <th>Professional Solutions</th>
+                <th>Seeds</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for value in tables %}
+            <tr>
+                <td>{{ value[1] }}</td>
+                <td>{{ value[2] }}</td>
+                <td>{{ value[-1] }}</td>
+                <td>{{ value[3] }}</td>
+                <td>{{ value[4] }}</td>
+                <td>{{ value[0] }}</td>
+                <td>{{ value[5] }}</td>
+                <td>{{ value[6] }}</td>
+                <td>{{ value[7] }}</td>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</body>
+
+</html>
+
+
