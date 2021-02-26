@@ -3,11 +3,10 @@
 List adverts
 {% endblock %}
 {% block content %}
-
 <h2>List of {{count}} adverts for {{country}}</h2>
-
-
   {% for advert in adverts%}
+
+  <div class="adverts-form">
   <form  name='adverts_form{{advert.advert_id}}' class="listadverts" id="form{{advert.advert_id}}" action="/getadverts/{{country}}" onsubmit="return ValidateForm({{advert.advert_id}})" method="post">
     
     
@@ -15,7 +14,7 @@ List adverts
 
         <div class=seller_details id=seller_details>
           <p>{{advert.domain}}</p>
-          <a href="{{url_for('seller_information', type=advert.seller)}}"><p>Seller: {{advert.seller}}</p></a>
+          <a href="{{url_for('seller_information', type=advert.seller)}}",  target="_blank"><p>Seller: {{advert.seller}}</p></a>
           <p>Price: {{advert.price}}</p>
           
         </div>
@@ -32,22 +31,20 @@ List adverts
         </div>
 
         <div class=url>
-        <a href={{advert.url}} , target="_blank">{{advert.product}}</a>
+          <a href={{advert.url}}  target="_blank">{{advert.product}}</a>
         </div>
 
+      <div class='select-form'>
         <select id="category" name="category">
           <option value="{{advert.category}}">{{advert.category}}</option>
           <option value="suspected counterfeiter">Suspected Counterfeiter</option>
           <option value="takedown">Takedown</option>
-          <option value="no action">No Action - This Advert</option>
-          <option value="no action all">No Action - All Sellers Adverts</option>
-          <option value="Outofstock/Paused">Out of Stock / Paused</option>
-          <option value="syngenta authorised">Syngenta Authorised</option>
+          <option value="no action">No action - this advert</option>
+          <option value="no action all">No action - all sellers adverts</option>
+          <option value="syngenta authorised">syngenta authorised</option>
           <option value="not relevant">Not Relevant</option>
-          
-
         </select>
-      
+
 
         <select id="business" name="business">
           <option value="{{advert.business}}">{{advert.business}}</option>
@@ -55,14 +52,16 @@ List adverts
           <option value="Seeds">Seeds</option>
           <option value="Professional Solutions">Professional Solutions</option>
         </select>
-      
-        <textarea id="comments" name="comments" style="height: 50px; width: 200px" style="font-family:sans-serif;font-size:1.2em;" placeholder="(optional) Notes"></textarea>
-
-        <button id="btn{{advert.advert_id}}" type="submit" form="form{{advert.advert_id}}" value="Submit">Submit</button>
-
-
+        <button id="btn{{advert.advert_id}}" type="submit" form="form{{advert.advert_id}}" style="width: 190px; height: 80px;" value="Submit">Submit</button>
+        </div>
+        <div class="textbox-ad">
+        <textarea id="comments" name="comments" rows="3" style="font-family:sans-serif;font-size: 15px;" placeholder="(optional) Notes"></textarea>
+        </div>
+        
+        </div>
   </form>
-
+  </div>
+  <div class="space"></div>
   {% endfor %}
 
 
