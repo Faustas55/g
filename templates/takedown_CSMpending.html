@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layouttakedown.html" %}
 {% block title %}
 List adverts
 {% endblock %}
@@ -7,17 +7,11 @@ List adverts
 <h2>List of {{count}} takedowns </h2>
 
 <html>
-<body>
 
-<button onclick="location.href='/takedown_home'" class="button_takedowns">To Main Page</button>
-<button onclick="location.href='/takedown_pendingoutput'" class="button_takedownssubmit">To Takedown Export</button>
-
-</body>
 </html>
 
-
-
   {% for advert in adverts%}
+  <div class="adverts-form">
   <form  name='adverts_form{{advert.advert_id}}' class="listadverts" id="form{{advert.advert_id}}" action="/takedown_CSMpending" onsubmit="return ValidateForm({{advert.advert_id}})" method="post">
     
     
@@ -26,41 +20,35 @@ List adverts
         <div class=seller_details>
           <p>{{advert.domain}}</p>
           <p>Seller: {{advert.seller}}</p>  
-          
-          
+          <p>Date Categorised: {{advert.updated_date}}</p>
         </div>
     
 
         <div class=url>
         <a href={{advert.url}} , target="_blank">{{advert.product}}</a>
         </div>
-        <div>
-          <table align="center" class="table  table-bordered table-responsive" style="border:none;">
-            <tr style="border: none;">
-              <td class="rem" style="border: none;">
-                <div id=details>
-                  <p>Date Categorised: {{advert.updated_date}}</p>
-                  <a href="mailto:{{advert.SP_firstname}}.{{advert.SP_lastname}}@syngenta.com?subject=Takedown Clarification: {{advert.product}}&body=Hi {{advert.SP_firstname}},%0D%0D Could you add comments?" >CSM: {{advert.SP_firstname}} {{advert.SP_lastname}}</a>
-                  <p>CSM Comments: {{advert.comments}}</p></div>
-              </td>
-              <td td class="rem" style="border: none;">
-                <div id=justificationcomments>
-                  <select id="status" name="status">
-                    <option value="Takedown Reviewed and Ready to be Sent to CSC">Send to CSC</option>
-                    <option value="Ad Reviewed, Takedown Not Possible">Delete</option>
-                  </select>
-                  <textarea id="justification" name="justification" style="height: 50px; width: 200px" style="font-family:sans-serif;font-size:1.2em;" placeholder="Justification"></textarea></div>
-              </td>
-            </tr>
-          </table>
+
+        <div class='takedown-details' >
+          <a href="mailto:{{advert.SP_firstname}}.{{advert.SP_lastname}}@syngenta.com?subject=Clarification Needed&body=Dear {{advert.SP_firstname}},%0D%0DFor takedown action on the following advertisement we need additional information or clarification:%0D%0D%0D%0DAdvert Title: {{advert.product}}%0D%0DURL: {{advert.url}}%0D%0DCRM Comment: {{advert.comments}}%0D%0DDate: {{advert.updated_date}}%0D%0DAdvert ID Number: {{advert.advert_id}}%0D%0D%0D%0DWould you please%0D%0D%0D%0DThank you.%0D%0DKind Regards, %0D%0DMichelle" >CSM: {{advert.SP_firstname}} {{advert.SP_lastname}}</a>
+          <p>CSM Comments: {{advert.comments}}</p>
         </div>
 
-          
+        <div class='takedown-dropdown'>
+          <select id="statustakedown" name="statustakedown">
+            <option value="Takedown Reviewed and Ready to be Sent to CSC">Send to CSC</option>
+            <option value="Ad Reviewed, Takedown Not Possible">Delete</option>
+          </select>
 
+          <textarea id="justification" name="justification" rows='4' style="height: 50px; width: 200px" style="font-family:sans-serif;font-size:1.2em;" placeholder="Justification"></textarea>
+          <button id="btn{{advert.advert_id}}" type="submit" form="form{{advert.advert_id}}" value="Submit">Submit</button>
+        </div>
+      
 
-        <button id="btn{{advert.advert_id}}" type="submit" form="form{{advert.advert_id}}" value="Submit">Submit</button>
+        
 
   </form>
+  </div>
+  <div class="space"></div>
 
   {% endfor %}
 
