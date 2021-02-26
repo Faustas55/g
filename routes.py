@@ -367,6 +367,91 @@ def takedown_pendingoutput():
             "takedown_pendingoutput.html", tables=dflist
         )
     
+@app.route("/reportsintro")
+def reportsintro():
+    return render_template("reportsintro.html")
+
+
+@app.route("/reports_takedowns", methods=("POST","GET"))
+def reports_takedowns():
+    
+    #now = datetime.now()
+    #fortyfivedays = now - timedelta(days=45)
+    
+    # connect to the DB and looks for pending takedowns
+    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.review == "Sent to CSC for Takedown").statement, con=db.session.bind)
+
+    df=list(df.values)
+
+    return render_template("reports_takedowns.html", tables=df)
+    
+
+@app.route("/reports_successfultakedown", methods=("POST","GET"))
+def reports_successfultakedown():
+    
+    #now = datetime.now()
+    #fortyfivedays = now - timedelta(days=45)
+    # connect to the DB and and looks successful takedowns
+    df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.review == "Successful Takedown", Advert.polonius_caseid == None).statement, con=db.session.bind)
+   
+    #merging for additional data
+    dftakedowns=pd.read_sql(sql=db.session.query(Takedown).with_entities(Takedown.advert_id, Takedown.takedown_confirmed).statement, con=db.session.bind)
+    df=df.merge(dftakedowns, on="advert_id", how="left")
+    df=list(df.values)
+    
+    
+    return render_template("reports_successfultakedown.html", tables=df)
+
+@app.route("/reports_highlevel", methods=("POST","GET"))
+def reports_highlevel():
+
+    df=pd.DataFrame()
+    #prepares the report
+    if request.method == "POST":
+
+        #retrieves the date range from the front end and runs sql with the dates
+        start_date = request.form.get("Start Date")
+        end_date = request.form.get("End Date")
+        df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.uploaded_date <= end_date, Advert.uploaded_date >= start_date).statement, con=db.session.bind)
+
+        #copies for further data transformation
+        df_count= df.copy()
+        df_value= df.copy()
+
+        #workaround if the columns do not exist
+        df = df.groupby(['region','country', 'review']).size().unstack(fill_value=0).reset_index()
+        if 'Ad Reviewed, Takedown Not Possible' not in df:
+            df['Ad Reviewed, Takedown Not Possible']=0
+        if 'Waiting for CSM Clarification' not in df:
+            df['Waiting for CSM Clarification']=0
+        if 'Takedown Reviewed and Ready to be Sent to CSC' not in df:
+            df['Takedown Reviewed and Ready to be Sent to CSC']=0
+        if 'Successful Takedown' not in df:
+            df['Successful Takedown']=0
+
+        #preparing the columns and calculating the number of reviewed takedowns and takedowns actually sent for enforcement
+        df = df[['Sent to Review','Ad Reviewed, Takedown Not Possible', 'Waiting for CSM Clarification', 'Takedown Reviewed and Ready to be Sent to CSC', 'Sent to CSC for Takedown','Successful Takedown', 'country','region']]
+        cols_to_sum = df.columns[1:6]
+        df['Takedowns Reviewed'] = df[cols_to_sum].sum(axis=1)
+        sent_for_TD = df.columns[4:5]
+        df['Sent for TD'] = df[sent_for_TD].sum(axis=1)
+
+        #dropping columns that are not necessary for the report
+        df=df.drop(columns=['Sent to Review','Ad Reviewed, Takedown Not Possible', 'Waiting for CSM Clarification', 'Takedown Reviewed and Ready to be Sent to CSC', 'Sent to CSC for Takedown'])
         
+        #looking at successful takedown
+        df_value= df_value.loc[df_value['review'] == 'Successful Takedown']
+        df_value= df_value.groupby(['country','business']).size().unstack(fill_value=0).reset_index()
+
+        #counting the number of ads detected by scrapers by country and merging everything with the main DF
+        df_count=df_count['country'].value_counts().rename_axis('country').reset_index(name='Ads Detected by Scrapers')
+
+        df=df.merge(df_value,how='left', on='country')
+
+        df=df.merge(df_count, how='left', on='country')
+
+        df=list(df.values)
+
+    return render_template("reports_highlevel.html", tables=df)     
     
 
