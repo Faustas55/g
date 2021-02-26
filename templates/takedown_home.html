@@ -1,40 +1,85 @@
-{% extends "layout.html" %}
-{% block title %}
-Home
-{% endblock %}
-{% block content %}
+<!DOCTYPE>
+<html>
 
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='animations.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='components.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='content-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fullpage.twoside.css')}}" />    
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='image-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.min.css')}}" />
+</head>
+<header>
+    <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-main navbar-middle">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav" >
+                        <li><a href="{{ url_for('takedown_home') }}"><b>Review</b></a></li>
+                        <li><a href="{{ url_for('takedown_pendingoutput') }}"><b>Export</b></a></li>
+                        <li class="logo-item"><a href="https://syngenta.sharepoint.com/sites/mySyngenta/"><img src="{{url_for('static', filename='SGlogo1.png')}}" alt="logo" ></a></li>
+                        <li><a href="{{ url_for('takedown_CSMpending') }}"><b>Pending with CSM</b></a></li>
+                        <li><a href="{{ url_for('reportsintro') }}"><b>Reports</b></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
 
-<h2>Takedowns</h2>
-
-<body>
-
-    <button onclick="location.href='/takedown_CSMpending'" class="button_takedownssubmit">To Takedowns Pending with CSMs</button>
-    <button onclick="location.href='/takedown_pendingoutput'" class="button_takedowns">To Takedown Export</button>
-    
-</body>
-
-<div id="dropdownmenu">
-
-
-    <form id="formCountry" ,action="home" method="POST">
-        <p>Please select a country</p>
+<div class='home-form'>
+    <div class='welcome-sign-takedown'>
+        <p>Takedowns</p>
+    </div>
+    <div class='home-contents'>
+        <p>Please Select a Country</p>
+        <form id="formCountry" method="POST">
         <select id="country" name="country">
         {% for i in combined %}
-            {% for country,takedowns in i.items() %}
-
-            <option value="{{country}}">{{country}} (Pending:{{takedowns}})</option>
+            {% for country,uncategorised in i.items() %}
+            <option value="{{country}}">{{country}} (Takedowns for Review:{{uncategorised}})</option>
             {%endfor%}
         {%endfor%}
-        </select>
-
-        <button class="btncountry" id="btnCountry" type="submit" form="formCountry" value="Submit">Submit</button>
-
-    </form>
-
-
+    </select>
+</form>
+            
+        <button type="submit" form="formCountry" value="Submit" class="btn btn-sm btn-default">Submit</button> 
+    </div>
 </div>
 
 
+<footer class="footer footer-center-home">
+    <div class="content">
+       <div class="container">
+           <div class="row footer-main">
+               <img src="{{url_for('static', filename='logo2.png')}}"/>
+               <hr class="space xs" />
+           </div>
+           <div class="row copy-row">
+               <div class="col-md-12 copy-text">
+                   <div class="tag-row">
+                       <span>Hades Created By Corporate Security Online Team © 2021</span>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
 
-{% endblock %}
+   <!-- SCRIPTS AND STYLES HERE -->
+</footer>
+</html>
+
+
+
+
+
+
