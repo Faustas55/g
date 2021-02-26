@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layouttakedown.html" %}
 {% block title %}
 List Takedowns
 {% endblock %}
@@ -23,12 +23,6 @@ List Takedowns
     </script>
 </head>
 
-<body>
-
-    <button onclick="location.href='/takedown_CSMpending'" class="button_takedownssubmit">To Takedowns Pending with CSMs</button>
-    <button onclick="location.href='/takedown_home'" class="button_takedowns">To Main Page</button>
-    
-</body>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -75,7 +69,7 @@ List Takedowns
 </div>
 
 
-<div id="exportbutton">
+<div class="exportbutton">
 <body>
     <form method ="post" id="exportbutton">
         <button onclick="alertFunction()" type="submit" value="Submit" >Export Takedowns</button>
@@ -83,7 +77,7 @@ List Takedowns
 
     <script>
         function alertFunction() {
-          alert("Takedowns successfully exported !");
+          alert("Takedowns successfully exported!");
         }
         </script>
   </body>
