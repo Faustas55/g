@@ -6,57 +6,69 @@ Hades Help
 
 <h2>Hades v2.0 help page</h2>
 
-<div class=help>
-
-  <ul>
-  <li>Hades V2.0 is a web application built by the corporate security online team</li>
-  <li>Can be Used by multiple users to categorise online adverts found by Hades </li>
-  <li>Automatically send suspected cases and take down cases to polonius case mangement </li>
-  <li>Remembers the last category selected for a seller </li>
-  <li>Coming soon ! version will have machine learning to suggest if advert crop protection or seeds </li>
-  </ul>  
-  
-
-</div>
-
-
 
 
 
   <h3>Hades v2 Categories: What do they mean?</h3>
-
-<table >
+<div class='help-table'>
+<table id="grid-basic" class="table table-condensed table-hover table-striped bootgrid-table">
+  <thead>
+    <tr>
+      <th data-column-id="Category">
+          <a class="column-header-anchor sortable">
+              <span class="text">Category</span><span class="icon fa"></span>
+          </a>
+      </th>
+      <th data-column-id="Action">
+            <a class="column-header-anchor sortable">
+                <span class="text">Action</span><span class="icon fa"></span>
+            </a>
+        </th>
+        <th data-column-id="Explanation">
+          <a class="column-header-anchor sortable">
+              <span class="text">Explanation</span><span class="icon fa fa-sort-desc"></span>
+          </a>
+      </th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+      <td>Suspected Counterfeiter</td>
+      <td>A case is opened in Polonious</td>
+      <td>A test purchase will be conducted for the case that is opened in Polonious</td>
+    </tr>
+    <tr>
+      <td>Takedown</td>
+      <td>A case is opened in Polonious</td>
+      <td>The case that is opened in Polonious, followed by a takedown of the advert</td>
+    </tr>
+    <tr>
+      <td>Not Relevant</td>
+      <td>Deletes all adverts for that seller for that e-commerce site</td>
+      <td>Applies to all adverts placed by the seller in the future. No adverts will be seen from this seller</td>
+    </tr>
   <tr>
-    <th>Category</th>
-    <th>Action</th> 
-    <th>Explanation</th>
-  </tr>
+      <td>Syngenta Authorised</td>
+      <td>Whitelist adverts by this seller</td>
+      <td>New adverts will not appear for review, but will be kept in the database</td>
+    </tr>
   <tr>
-    <td>Suspected Counterfeiter</td>
-    <td>A case is opened in Polonious</td>
-    <td>A test purchase will be conducted for the case that is opened in Polonious</td>
-  </tr>
-  <tr>
-    <td>Takedown</td>
-    <td>A case is opened in Polonious</td>
-    <td>The case that is opened in Polonious, followed by a takedown of the advert</td>
-  </tr>
-  <tr>
-    <td>Not Relevant</td>
-    <td>Deletes all adverts for that seller for that e-commerce site</td>
-    <td>Applies to all adverts placed by the seller in the future. No adverts will be seen from this seller</td>
-  </tr>
-<tr>
-    <td>Syngenta Authorised</td>
-    <td>Whitelist adverts by this seller</td>
-    <td>New adverts will not appear for review, but will be kept in the database</td>
-  </tr>
-<tr>
-    <td>No Action</td>
-    <td>Deletes this particular advert</td>
-    <td>A particular advert will be deleted, but other adverts from the seller will appear for review</td>
-  </tr>
+      <td>No Action - This Advert</td>
+      <td>Deletes this particular advert</td>
+      <td>A particular advert will be deleted, but other adverts from the seller will appear for review</td>
+    </tr>
+    <tr>
+      <td>No Action - All Seller Adverts</td>
+      <td>Deletes all seller's advert from a particular domain</td>
+      <td>All sellers's adverts on a particular domain will be deleted, but other adverts from the seller will appear for review</td>
+    </tr>
+    <tr>
+      <td>Out Of Stock / Paused</td>
+      <td>Deletes this particular advert if it is expired/paused/unlisted</td>
+      <td>A particular advert will be deleted, but will be monitored in the background and will appear in the list once it is active again</td>
+    </tr>
+</tbody>
 </table>
-
+</div>
 
 {% endblock %}
