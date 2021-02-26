@@ -4,8 +4,14 @@
 <head>
     <meta charset="utf-8" />
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='normalize.css')}}" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='animations.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='components.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='content-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fullpage.twoside.css')}}" />    
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='image-box.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-theme.min.css')}}" />
 
     <script>
         function ValidateForm(advert_id){
@@ -32,27 +38,53 @@
 
     </script>
 
-
-
 </head>
-
-<body>
-    <div class="navbar">
-        <a href="{{ url_for('home') }}" class="navbar-brand">Review Adverts</a>
-        <a href="{{ url_for('help') }}" class="navbar-item">Help</a>
-        <a href="{{ url_for('about') }}" class="navbar-item">About</a>
-        <a href="{{ url_for('takedowns') }}" class="navbar-item">Takedowns</a>
+<header>
+    <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-main navbar-middle">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav" >
+                        <li><a href="{{ url_for('home') }}"><b>Review</b></a></li>
+                        <li><a href="{{ url_for('help') }}"><b>Help</b></a></li>
+                        <li class="logo-item"><a href="https://syngenta.sharepoint.com/sites/mySyngenta/"><img src="{{url_for('static', filename='SGlogo1.png')}}" alt="logo" ></a></li>
+                        <li><a href="{{ url_for('about') }}"><b>About</b></a></li>
+                        <li><a href="https://splunk.syngentaazure.org/en-GB/app/splunk-dashboard-app/e2e/"><b>Reports</b></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
+</header>
 
-    <div class="body-content">
-        {% block content %}
-        {% endblock %}
-        <hr />
-        <footer>
-            <img src="{{url_for('static', filename='logo1.png')}}"/>
-            <h6>HadesV2 Created by Corporate Security Online Team © 2021</h6>
-        </footer>
-    </div>
-</body>
 
+
+
+
+{% block content %}
+{% endblock %}
+<footer class="footer footer-center">
+    <div class="content">
+       <div class="container">
+           <div class="row footer-main">
+               <img src="{{url_for('static', filename='logo2.png')}}"/>
+               <hr class="space xs" />
+           </div>
+           <div class="row copy-row">
+               <div class="col-md-12 copy-text">
+                   <div class="tag-row">
+                       <span>Hades Created By Corporate Security Online Team © 2021</span>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <!-- SCRIPTS AND STYLES HERE -->
+</footer>
 </html>
