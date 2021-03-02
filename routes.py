@@ -389,14 +389,14 @@ def reports_takedowns():
 @app.route("/reports_successfultakedown", methods=("POST","GET"))
 def reports_successfultakedown():
     
-    #now = datetime.now()
-    #fortyfivedays = now - timedelta(days=45)
-    # connect to the DB and and looks successful takedowns
+    now = datetime.now()
+    thirtydays = now - timedelta(days=30)
+    # connect to the DB and transforms it to a list so the data can be presented using DataTables. Last 30days only
     df=pd.read_sql(sql=db.session.query(Advert).filter(Advert.category == "takedown", Advert.review == "Successful Takedown", Advert.polonius_caseid == None).statement, con=db.session.bind)
-   
-    #merging for additional data
-    dftakedowns=pd.read_sql(sql=db.session.query(Takedown).with_entities(Takedown.advert_id, Takedown.takedown_confirmed).statement, con=db.session.bind)
+
+    dftakedowns=pd.read_sql(sql=db.session.query(Takedown).filter(Takedown.takedown_confirmed > thirtydays).with_entities(Takedown.advert_id, Takedown.takedown_confirmed).statement, con=db.session.bind)
     df=df.merge(dftakedowns, on="advert_id", how="left")
+
     df=list(df.values)
     
     
@@ -454,16 +454,20 @@ def reports_highlevel():
             df['Crop Protection']=0
         if 'Professional Solutions' not in df:
             df['Professional Solutions']=0
+            
         #fixing NaN values
         df = df.fillna(0)
+        
         #adding value
         df['CP Value'] = df['Crop Protection'].multiply(350)
         df['Professional Solutions Value'] = df['Professional Solutions'].multiply(1500)
         df['Seeds Value'] = df['Seeds'].multiply(200)
+        
         #addding $ sign
         df['CP Value'] = df['CP Value'].astype(str) + '$'
         df['Professional Solutions Value'] = df['Professional Solutions Value'].astype(str) + '$'
         df['Seeds Value'] = df['Seeds Value'].astype(str) + '$'
+        
         #preparing the columns for the front end
         df = df[['Successful Takedown','country', 'region', 'Takedowns Reviewed', 'Sent for TD', 'Crop Protection','Professional Solutions', 'Seeds', 'Ads Detected by Scrapers', 'CP Value', 'Professional Solutions Value', 'Seeds Value']]
         
