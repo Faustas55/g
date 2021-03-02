@@ -90,22 +90,28 @@
                 <th>Sent for Takedown</th>
                 <th>Successful Takedowns</th>
                 <th>Crop Protection</th>
+                <th>Crop Protection TD Value</th>
                 <th>Professional Solutions</th>
+                <th>Professional Solutions TD Value</th>
                 <th>Seeds</th>
+                <th>Seeds TD Value</th>
             </tr>
         </thead>
         <tbody>
             {% for value in tables %}
             <tr>
-                <td>{{ value[1] }}</td>
                 <td>{{ value[2] }}</td>
-                <td>{{ value[-1] }}</td>
+                <td>{{ value[1] }}</td>
+                <td>{{ value[8] }}</td>
                 <td>{{ value[3] }}</td>
                 <td>{{ value[4] }}</td>
                 <td>{{ value[0] }}</td>
                 <td>{{ value[5] }}</td>
+                <td>{{ value[9] }}</td>
                 <td>{{ value[6] }}</td>
+                <td>{{ value[10] }}</td>
                 <td>{{ value[7] }}</td>
+                <td>{{ value[11] }}</td>
                 </td>
             </tr>
             {% endfor %}
